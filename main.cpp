@@ -72,9 +72,65 @@ public:
         os << "Profession: " << profession << ", AFM: " << person.afm << ", Name: " << person.name << ", Age: " << person.age;
         return os;
     }
-    string getName()
+    string getAFM()
     {
-        return name;
+        return afm;
+    }
+};
+
+class Secretary
+{
+private:
+    vector<Person *> department;
+
+public:
+    Secretary();
+    ~Secretary()
+    {
+        for (auto &person : department)
+        {
+            delete person; // Deallocate memory for each Person object
+        }
+    };
+
+    // Overloading + operator
+    Secretary &operator+(Person *newPerson)
+    {
+        department.push_back(newPerson);
+        return *this;
+    }
+
+    // Overloading << operator for Secretary
+    friend ostream &operator<<(ostream &os, Secretary &secretary)
+    {
+        os << "Department Information:" << endl;
+        for (auto &person : secretary.department)
+        {
+            os << *person << endl;
+        }
+        return os;
+    }
+
+    // Overloading >> operator for Secretary
+    friend istream &operator>>(istream &is, Secretary &secretary)
+    {
+        Person *newPerson = new Person();
+        is >> *newPerson;
+        secretary.department.push_back(newPerson);
+        return is;
+    }
+
+    // Find a person by AFM
+    string findPerson(const string &afm)
+    {
+        for (auto &person : department)
+        {
+            if (person->getAFM() == afm)
+            {
+                return "Person Found"; // Person Found
+            }
+        }
+        return "Person NOT Found"; // Person NOT Found
     }
 };
 
