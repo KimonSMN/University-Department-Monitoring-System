@@ -93,6 +93,38 @@ public:
         }
     };
 
+    // Copy constructor
+    Secretary(const Secretary &other)
+    {
+        for (auto &person : other.department)
+        {
+            department.push_back(new Person(*person)); // Create a new copy of each Person and add to the department
+        }
+    }
+
+    // Overloading assignment operator
+    Secretary &operator=(const Secretary &other)
+    {
+        if (this == &other)
+        {
+            return *this; // Self-assignment, return current object
+        }
+
+        // Clear current department contents
+        for (auto &person : department)
+        {
+            delete person;
+        }
+        department.clear();
+
+        // Copy elements from the other Secretary
+        for (auto &person : other.department)
+        {
+            department.push_back(new Person(*person)); // Create a new copy of each Person and add to the department
+        }
+        return *this; // Return the updated object
+    }
+
     // Overloading + operator
     Secretary &operator+(Person *newPerson)
     {
