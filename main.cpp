@@ -1,7 +1,9 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <vector>
+#include <memory>
 #include <string>
-
 using namespace std;
 
 class Person
@@ -38,11 +40,10 @@ public:
     // Destructor for Person
     ~Person(){};
 
-    // Function to get the counter value
-    static int getCounter()
-    {
-        return counter;
-    }
+    static int getCounter() { return counter; } // Function to get the counter value
+    string getAFM() { return afm; }             // Function to return the afm
+    string getName() { return name; }           // Function to return the name
+    int getAge() { return age; }                // Function to return the age
 
     // Overload of >> operator
     friend istream &operator>>(istream &is, Person &person)
@@ -114,146 +115,74 @@ public:
         os << "Profession: " << profession << ", AFM: " << person.afm << ", Name: " << person.name << ", Age: " << person.age;
         return os;
     }
-
-    // Function to return the afm
-    string getAFM()
-    {
-        return afm;
-    }
 };
 
-int Person::counter = 0; // Initializing the static member variable
+// int Person::counter = 0; // Initializing the static member variable
 
 class Secretary
 {
 private:
-    vector<Person *> department; // Vector to store the Person objects
+    vector<Student *> allStudents;
+    vector<Professor *> allProfessors;
+    vector<Course *> allCourses;
+    vector<Semester *> allSemesters;
 
 public:
     // Constructor
     Secretary(){};
     // Destructor
-    ~Secretary()
+    ~Secretary(){};
+};
+
+class Student : private Person
+{
+private:
+    int currentSemester;
+    int accumulatedPoints;
+    int finalGrade;
+    vector<Course *> enrolledCourses;
+
+public:
+    string getStudentName()
     {
-        for (auto &person : department) // For every Person in department
-        {
-            delete person; // Deallocate memory for each Person object
-        }
-    };
-
-    // Copy constructor
-    Secretary(const Secretary &other)
-    {
-        for (auto &person : other.department)
-        {
-            department.push_back(new Person(*person)); // Create a new copy of each Person and add to the department
-        }
-    }
-
-    // Overloading assignment operator
-    Secretary &operator=(const Secretary &other)
-    {
-        if (this == &other)
-        {
-            return *this; // Return current object
-        }
-
-        for (auto &person : department)
-        {
-            delete person; // Deallocate memory for each Person object
-        }
-        department.clear();
-
-        // Copy elements from the other department
-        for (auto &person : other.department)
-        {
-            department.push_back(new Person(*person)); // Create a new copy of each Person, add them to the department
-        }
-        return *this; // Return the new object
-    }
-
-    // Overloading + operator
-    Secretary &operator+(Person *newPerson)
-    {
-        department.push_back(newPerson);
-        return *this;
-    }
-
-    // Overloading << operator for Secretary
-    friend ostream &operator<<(ostream &os, Secretary &secretary)
-    {
-        os << "Department Information:" << endl;
-        for (auto &person : secretary.department)
-        {
-            os << *person << endl;
-        }
-        return os;
-    }
-
-    // Overloading >> operator for Secretary
-    friend istream &operator>>(istream &is, Secretary &secretary)
-    {
-        Person *newPerson = new Person();
-        is >> *newPerson;
-        secretary.department.push_back(newPerson);
-        return is;
-    }
-
-    // Find a person by AFM
-    string findPerson(const string &afm)
-    {
-        for (auto &person : department)
-        {
-            if (person->getAFM() == afm)
-            {
-                return "Person Found"; // Person Found
-            }
-        }
-        return "Person NOT Found"; // Person NOT Found
+        return getName();
     }
 };
 
-class Student : public Person
+class Professor : private Person
 {
-public:
-    // Student-specific attributes and methods can be added here
-    Student() : Person() {}                                        // Default constructor
-    Student(string af, string n, int ag) : Person(af, n, ag, 1) {} // Constructor with parameters
-};
+private:
+    vector<Course *> taughtCourses;
 
-class Professor : public Person
-{
 public:
-    // Professor-specific attributes and methods can be added here
-    Professor() : Person() {}                                        // Default constructor
-    Professor(string af, string n, int ag) : Person(af, n, ag, 0) {} // Constructor with parameters
+    Professor()
+    {
+
+    } // Constructor
 };
 
 class Course
 {
 private:
-    int semester;     // Semester of the course (1-8)
-    int points;       // Points awarded by the course
-    bool isMandatory; // Whether the course is mandatory
+    string courseName;
+    int semester;
+    int points;
+    bool isMandatory;
+    vector<Student *> enrolledStudents;
+    vector<Professor *> assignedProfessors;
 
 public:
-    // Constructors
-    Course() : semester(1), points(0), isMandatory(false) {}
-    Course(int sem, int pts, bool mandatory) : semester(sem), points(pts), isMandatory(mandatory) {}
-
-    // Getters and setters for private attributes
-    int getSemester() const { return semester; }
-    void setSemester(int sem) { semester = sem; }
-
-    int getPoints() const { return points; }
-    void setPoints(int pts) { points = pts; }
-
-    bool getIsMandatory() const { return isMandatory; }
-    void setIsMandatory(bool mandatory) { isMandatory = mandatory; }
 };
 
-int main()
+class Semester
 {
+private:
+    vector<Course *> coursesOffered;
 
+public:
+};
+
+main()
+{
     return 0;
 }
