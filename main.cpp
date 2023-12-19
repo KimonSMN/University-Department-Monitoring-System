@@ -7,10 +7,11 @@ using namespace std;
 class Person
 {
 private:
-    string afm;    // AFM of Person object
-    string name;   // Name of Person object
-    int age;       // Age of Person object
-    int isStudent; // Variable to check Profession
+    static int counter; // Variable to count Person objects
+    string afm;         // AFM of Person object
+    string name;        // Name of Person object
+    int age;            // Age of Person object
+    int isStudent;      // Variable to check Profession
 
 public:
     // Default Constructor for Person
@@ -20,6 +21,7 @@ public:
         name = "";
         age = 0;
         isStudent = -1;
+        counter++;
         cout << "Default constructor called" << endl;
     };
 
@@ -30,10 +32,17 @@ public:
         name = n;
         age = ag;
         isStudent = i;
+        counter++;
     }
 
     // Destructor for Person
     ~Person(){};
+
+    // Function to get the counter value
+    static int getCounter()
+    {
+        return counter;
+    }
 
     // Overload of >> operator
     friend istream &operator>>(istream &is, Person &person)
@@ -112,6 +121,8 @@ public:
         return afm;
     }
 };
+
+int Person::counter = 0; // Initializing the static member variable
 
 class Secretary
 {
@@ -202,42 +213,47 @@ public:
     }
 };
 
+class Student : public Person
+{
+public:
+    // Student-specific attributes and methods can be added here
+    Student() : Person() {}                                        // Default constructor
+    Student(string af, string n, int ag) : Person(af, n, ag, 1) {} // Constructor with parameters
+};
+
+class Professor : public Person
+{
+public:
+    // Professor-specific attributes and methods can be added here
+    Professor() : Person() {}                                        // Default constructor
+    Professor(string af, string n, int ag) : Person(af, n, ag, 0) {} // Constructor with parameters
+};
+
+class Course
+{
+private:
+    int semester;     // Semester of the course (1-8)
+    int points;       // Points awarded by the course
+    bool isMandatory; // Whether the course is mandatory
+
+public:
+    // Constructors
+    Course() : semester(1), points(0), isMandatory(false) {}
+    Course(int sem, int pts, bool mandatory) : semester(sem), points(pts), isMandatory(mandatory) {}
+
+    // Getters and setters for private attributes
+    int getSemester() const { return semester; }
+    void setSemester(int sem) { semester = sem; }
+
+    int getPoints() const { return points; }
+    void setPoints(int pts) { points = pts; }
+
+    bool getIsMandatory() const { return isMandatory; }
+    void setIsMandatory(bool mandatory) { isMandatory = mandatory; }
+};
+
 int main()
 {
-    Secretary department;
-
-    // Adding person objects to the department
-    cout << "Adding persons to the department: " << endl;
-    Person *person1 = new Person("00165", "Nikos", 25, 1);
-    Person *person2 = new Person("00001", "Giannis", 37, 0);
-
-    department = department + person1 + person2;
-
-    // Displaying Department
-    cout << department << endl;
-
-    // Find person by AFM
-    string afmToFind;
-    cout << "Enter AFM to find: ";
-    cin >> afmToFind;
-    string result = department.findPerson(afmToFind); // Call findPerson Function
-    cout << "Person with AFM " << afmToFind << ": " << result << endl;
-
-    // User input to add a new person
-    cout << "Enter details of a new person to add to the department: " << endl;
-    Person *newPerson = new Person();
-    cin >> *newPerson;
-
-    department = department + newPerson; // Add person to the department
-
-    // Display updated department information
-    cout << "Updated department information: " << endl;
-    cout << department << endl;
-
-    // Clean up memory for Person objects
-    delete person1;
-    delete person2;
-    delete newPerson;
 
     return 0;
 }
