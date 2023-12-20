@@ -7,6 +7,17 @@
 
 using namespace std;
 
+string trim(const string &str)
+{
+    size_t first = str.find_first_not_of(" \t\n\r");
+    if (string::npos == first)
+    {
+        return str;
+    }
+    size_t last = str.find_last_not_of(" \t\n\r");
+    return str.substr(first, (last - first + 1));
+}
+
 // Forward declarations
 class Student;
 class Professor;
@@ -42,11 +53,12 @@ public:
     ~Person(){};
 
     static int getCounter() { return counter; }      // Function to get the counter value
-    string getAFM() { return afm; }                  // Function to return the afm
+    string getAFM() const { return afm; }            // Function to return the afm
     string getName() const { return name; }          // Function to return the name
-    int getAge() { return age; }                     // Function to return the age
-    int getIfStudent() { return isStudent; }         // Function to return If Student
+    int getAge() const { return age; }               // Function to return the age
+    int getIfStudent() const { return isStudent; }   // Function to return If Student
     void setName(string newName) { name = newName; } // Function to set Name
+    void setAfm(string newAfm) { afm = newAfm; }     // Function to set Afm
     // Overload of >> operator
     friend istream &operator>>(istream &is, Person &person)
     {
@@ -232,17 +244,40 @@ public:
             cerr << "Error opening file" << endl;
             return;
         }
+
+        // Skip the first line (header)
+        getline(file, line);
+
         while (getline(file, line))
         {
             stringstream ss(line);
-            string name;
-            if (getline(ss, name, ',')) // Assuming name is the first item before the comma
+            string name, afm;
+            int age;
+
+            getline(ss, name, ',');
+            getline(ss, afm, ',');
+            ss >> age; // Assuming further parsing for age, etc.
+
+            // Trim the AFM string
+            afm = trim(afm);
+
+            // Debug output
+            cout << "Debug: AFM = '" << afm << "'" << endl;
+
+            if (afm.empty())
             {
-                Student *newStudent = new Student(); // Assuming such a constructor exists
-                newStudent->setName(name);
-                allStudents.push_back(newStudent);
+                cerr << "Warning: Empty AFM found, skipping line." << endl;
+                continue; // Skip this line if AFM is empty
             }
+
+            Student *newStudent = new Student();
+            newStudent->setAfm(afm);
+            newStudent->setName(name);
+            // Set other properties as needed
+
+            allStudents.push_back(newStudent);
         }
+
         file.close();
     }
 
@@ -345,9 +380,6 @@ int main()
     // Create an instance of Secretary
     Secretary secretary;
 
-    // Add a new student
-    secretary.addStudent("John Doe", "123456789", 20);
-
     // Load students and professors from CSV files
     secretary.loadStudents();
     secretary.loadProfessors();
@@ -356,14 +388,14 @@ int main()
     cout << "Loaded Students: " << endl;
     for (const auto *student : secretary.getStudents())
     {
-        cout << student->getName() << endl;
+        cout << "AFM: " << student->getAFM() << endl;
     }
 
     // Displaying loaded professors
     cout << "Loaded Professors: " << endl;
     for (const auto *professor : secretary.getProfessors())
     {
-        cout << professor->getName() << endl;
+        cout << "Name: " << professor->getName() << endl;
     }
 
     return 0;
