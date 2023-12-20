@@ -28,7 +28,6 @@ public:
         age = 0;
         isStudent = -1;
         counter++;
-        cout << "Default constructor called" << endl;
     };
     // Constructor with Parameters for Person
     Person(string af, string n, int ag, int i)
@@ -130,36 +129,11 @@ public:
     vector<Student *> enrolledStudents;     // Vector of Students attending Course
     vector<Professor *> assignedProfessors; // Vectir of Professors assigned in Course
 
-    Course(string name, int sem, int pts, bool mandatory)
-        : courseName(name), semester(sem), points(pts), isMandatory(mandatory) {}
+    Course() {}
+
+    void setName(string newName) { courseName = newName; } // Function to set Name
+    string getName() const { return courseName; }          // Function to return Name
 };
-
-// class Semester
-// {
-// public:
-//     int semesterNumber;
-//     vector<Course *> coursesOffered;
-
-//     Semester(int number) : semesterNumber(number) {}
-
-//     void addCourse(Course *course)
-//     {
-//         if (course->semester == semesterNumber)
-//         {
-//             coursesOffered.push_back(course);
-//         }
-//     }
-
-//     void displayCourses()
-//     {
-//         cout << "Semester " << semesterNumber << " Courses:\n";
-//         for (auto course : coursesOffered)
-//         {
-//             cout << "  " << course->courseName << " - Points: " << course->points
-//                  << ", Mandatory: " << (course->isMandatory ? "Yes" : "No") << "\n";
-//         }
-//     }
-// };
 
 class Student : public Person
 {
@@ -167,11 +141,12 @@ private:
     int currentSemester;
     int accumulatedPoints;
     int finalGrade;
+    bool graduated;
     vector<Course *> enrolledCourses;
 
 public:
     // Constructor for Student
-    Student() : currentSemester(0), accumulatedPoints(0), finalGrade(0) {}
+    Student() : currentSemester(0), accumulatedPoints(0), finalGrade(0), graduated(0) {}
     // Destructor
     ~Student() {}
 
@@ -180,6 +155,19 @@ public:
         if (course->semester <= currentSemester) // If the semester is equal or less than the currentSemester
         {
             enrolledCourses.push_back(course);
+        }
+    }
+
+    void checkGraduation() // Function to check if able to graduate
+    {
+        if (currentSemester > 8 && accumulatedPoints >= 240) //
+        {
+            graduated = 1;
+            cout << "You can Graduate!" << endl;
+        }
+        else
+        {
+            cout << "You can't Graduate yet" << endl;
         }
     }
 
@@ -216,10 +204,7 @@ private:
 
 public:
     // Constructor for Secretary
-    Secretary()
-    {
-        cout << "Secretary constructor called" << endl;
-    }
+    Secretary() {}
     // Destructor
     ~Secretary()
     {
@@ -235,7 +220,6 @@ public:
         {
             delete course;
         }
-        cout << "Secretary destructor called" << endl;
     }
 
     void loadStudents()
@@ -259,7 +243,6 @@ public:
                 allStudents.push_back(newStudent);
             }
         }
-
         file.close();
     }
 
@@ -288,57 +271,86 @@ public:
         file.close();
     }
 
+    void loadCourses()
+    {
+        ifstream file("courses.csv");
+        string line;
+
+        if (!file.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string name;
+            if (getline(ss, name, ',')) // Assuming name is the first item before the comma
+            {
+                Course *newCourse = new Course(); // Assuming such a constructor exists
+                newCourse->setName(name);
+                allCourses.push_back(newCourse);
+            }
+        }
+
+        file.close();
+    }
+
     void enrollStudent(Student *student, Course *course) // Assigns student to Course
     {
-        if (student && course)
-        { // Check if the pointers are not null
+        if (student && course) // Check if the pointers are not null
             student->enrollInCourse(course);
-        }
     }
 
     void assignProfessor(Professor *professor, Course *course) // Assigns Professor to Course
     {
-        if (professor && course)
-        { // Check if the pointers are not null
+        if (professor && course) // Check if the pointers are not null
             professor->assignToCourse(course);
-        }
     }
 
-    // Getter for allStudents
-    const vector<Student *> &getStudents() const { return allStudents; }
+    void addStudent(const string &name, const string &afm, int age)
+    {
+        // Open the students.csv file in append mode
+        ofstream file("students.csv", ios::app);
+        if (!file.is_open())
+        {
+            cerr << "Error opening file for writing" << endl;
+            return;
+        }
 
-    // Getter for allProfessors
-    const vector<Professor *> &getProfessors() const { return allProfessors; }
+        // Write the new student's information to the file
+        file << name << "," << afm << "," << age << "," << 1 << "," << 0 << endl;
 
-    // Getter for allCourses
-    const vector<Course *> &getCourses() const { return allCourses; }
+        // Create a new Student object
+        Student *newStudent = new Student();
+        newStudent->setName(name);
+        // Assuming other properties (afm, age, etc.) are set through appropriate methods or constructors
+
+        // Add the new Student to the allStudents vector
+        allStudents.push_back(newStudent);
+
+        // Close the file
+        file.close();
+    }
+
+    const vector<Student *> &getStudents() const { return allStudents; }       // Getter for allStudents
+    const vector<Professor *> &getProfessors() const { return allProfessors; } // Getter for allProfessors
+    const vector<Course *> &getCourses() const { return allCourses; }          // Getter for allCourses
 };
 
 int Person::counter = 0;
 
 int main()
 {
+    // Create an instance of Secretary
     Secretary secretary;
 
-    // Load students and professors from the respective CSV files
+    // Add a new student
+    secretary.addStudent("John Doe", "123456789", 20);
+
+    // Load students and professors from CSV files
     secretary.loadStudents();
     secretary.loadProfessors();
-
-    // Assuming the CSV files have at least one student and one professor,
-    // and for demonstration purposes, we create a course manually.
-    Course *exampleCourse = new Course("Intro to Programming", 1, 3, true);
-
-    // Enrolling the first student in the example course
-    if (!secretary.getStudents().empty())
-    {
-        secretary.enrollStudent(secretary.getStudents().front(), exampleCourse);
-    }
-
-    // Assigning the first professor to the example course
-    if (!secretary.getProfessors().empty())
-    {
-        secretary.assignProfessor(secretary.getProfessors().front(), exampleCourse);
-    }
 
     // Displaying loaded students
     cout << "Loaded Students: " << endl;
@@ -353,9 +365,6 @@ int main()
     {
         cout << professor->getName() << endl;
     }
-
-    // Clean up the dynamically allocated Course object
-    delete exampleCourse;
 
     return 0;
 }
