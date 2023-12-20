@@ -7,6 +7,11 @@
     "iosfwd": "cpp",
     "memory": "cpp",
     "*.tcc": "cpp",
-    "fstream": "cpp"
-}
+    "fstream": "cpp",
+    "string": "cpp",
+    "istream": "cpp",
+    "typeinfo": "cpp",
+    "deque": "cpp",
+    "vector": "cpp"
+  }
 }
