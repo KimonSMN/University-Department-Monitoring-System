@@ -1,5 +1,5 @@
-CourseName,Semester,Points,Mandatory
-Mathematics,1,5,1
-Physics,1,4,0
-Literature,2,3,1
-Chemistry,1,4,0
+CourseId,CourseName,Semester,Points,Mandatory
+0001,Mathematics,1,5,1
+0002,Physics,1,4,0
+0003,Literature,2,3,1
+0004,Chemistry,1,4,0

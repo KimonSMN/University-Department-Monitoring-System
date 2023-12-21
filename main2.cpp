@@ -134,6 +134,7 @@ public:
 class Course
 {
 public:
+    int courseId;                           // Course Id
     string courseName;                      // Course name
     int semester;                           // Semester of Course
     int points;                             // Points that Course gives
@@ -141,10 +142,11 @@ public:
     vector<Student *> enrolledStudents;     // Vector of Students attending Course
     vector<Professor *> assignedProfessors; // Vectir of Professors assigned in Course
 
-    Course() {}
-
-    void setName(string newName) { courseName = newName; } // Function to set Name
-    string getName() const { return courseName; }          // Function to return Name
+    Course(int newCourseId) : courseId(newCourseId) {}
+    void setId(int newCourseId) { courseId = newCourseId; } // Function to set Name
+    void setName(string newName) { courseName = newName; }  // Function to set Name
+    string getName() const { return courseName; }           // Function to return Name
+    int getCourseId() const { return courseId; }            // Function to return Course Id
 };
 
 class Student : public Person
@@ -291,16 +293,38 @@ public:
             cerr << "Error opening file" << endl;
             return;
         }
+
+        // Skip the first line (header)
+        getline(file, line);
+
         while (getline(file, line))
         {
             stringstream ss(line);
-            string name;
-            if (getline(ss, name, ',')) // Assuming name is the first item before the comma
+            string name, afm;
+            int age;
+
+            getline(ss, name, ',');
+            getline(ss, afm, ',');
+            ss >> age; // Assuming further parsing for age, etc.
+
+            // Trim the AFM string
+            afm = trim(afm);
+
+            // Debug output
+            cout << "Debug: AFM = '" << afm << "'" << endl;
+
+            if (afm.empty())
             {
-                Professor *newProfessor = new Professor(); // Assuming such a constructor exists
-                newProfessor->setName(name);
-                allProfessors.push_back(newProfessor);
+                cerr << "Warning: Empty AFM found, skipping line." << endl;
+                continue; // Skip this line if AFM is empty
             }
+
+            Professor *newProfessor = new Professor();
+            newProfessor->setAfm(afm);
+            newProfessor->setName(name);
+            // Set other properties as needed
+
+            allProfessors.push_back(newProfessor);
         }
 
         file.close();
@@ -316,16 +340,32 @@ public:
             cerr << "Error opening file" << endl;
             return;
         }
+
+        // Skip the first line (header)
+        getline(file, line);
+
         while (getline(file, line))
         {
             stringstream ss(line);
-            string name;
-            if (getline(ss, name, ',')) // Assuming name is the first item before the comma
-            {
-                Course *newCourse = new Course(); // Assuming such a constructor exists
-                newCourse->setName(name);
-                allCourses.push_back(newCourse);
-            }
+            int courseId;
+            string temp, courseName; // Use 'temp' to read courseId as string and convert it to int
+            int semester, points;
+            bool mandatory;
+
+            getline(ss, temp, ',');
+            courseId = stoi(trim(temp)); // Convert to int after trimming
+            getline(ss, courseName, ',');
+            ss >> semester >> points;
+            ss.ignore(); // Ignore the comma after points
+            ss >> mandatory;
+
+            // Debug output
+            cout << "Debug: CourseId = '" << courseId << "', CourseName = '" << courseName << "'" << endl;
+
+            // Create a new Course object with courseId
+            Course *newCourse = new Course(courseId);
+
+            allCourses.push_back(newCourse);
         }
 
         file.close();
@@ -383,6 +423,7 @@ int main()
     // Load students and professors from CSV files
     secretary.loadStudents();
     secretary.loadProfessors();
+    secretary.loadCourses();
 
     // Displaying loaded students
     cout << "Loaded Students: " << endl;
@@ -398,5 +439,11 @@ int main()
         cout << "Name: " << professor->getName() << endl;
     }
 
+    // Displaying loaded professors
+    cout << "Loaded Courses: " << endl;
+    for (const auto *course : secretary.getCourses())
+    {
+        cout << "Course Id: " << course->getCourseId() << endl;
+    }
     return 0;
 }
