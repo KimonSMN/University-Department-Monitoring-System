@@ -59,6 +59,8 @@ public:
     int getIfStudent() const { return isStudent; }   // Function to return If Student
     void setName(string newName) { name = newName; } // Function to set Name
     void setAfm(string newAfm) { afm = newAfm; }     // Function to set Afm
+    void setAge(int newAge) { age = newAge; }        // Function to set Age
+
     // Overload of >> operator
     friend istream &operator>>(istream &is, Person &person)
     {
@@ -185,8 +187,22 @@ public:
         }
     }
 
-    // Calculate Points
-    int getAccumulatedPoints()
+    void setCurrentSemester(int newCurrentSemester)
+    {
+        currentSemester = newCurrentSemester;
+    }
+
+    void setAccumulatedPoints(int newAccumulatedPoints)
+    {
+        accumulatedPoints = newAccumulatedPoints;
+    }
+
+    int getCurrentSemester() const
+    {
+        return currentSemester;
+    }
+
+    int getAccumulatedPoints() const
     {
         return accumulatedPoints;
     }
@@ -272,6 +288,7 @@ public:
 
             getline(ss, name, ',');
             getline(ss, afm, ',');
+
             ss >> age; // Assuming further parsing for age, etc.
 
             // Trim the AFM string
@@ -289,6 +306,7 @@ public:
             Student *newStudent = new Student();
             newStudent->setAfm(afm);
             newStudent->setName(name);
+
             // Set other properties as needed
 
             allStudents.push_back(newStudent);
@@ -470,6 +488,52 @@ public:
         }
     }
 
+    void removeProfessor(const string &afm)
+    {
+        bool removed = false;
+        for (auto it = allProfessors.begin(); it != allProfessors.end();)
+        {
+            if ((*it)->getAFM() == afm)
+            {
+                delete *it;
+                it = allProfessors.erase(it); // Remove the student from the vector and update the iterator
+                removed = true;
+            }
+            else
+            {
+                ++it; // Only increment if not erased
+            }
+        }
+
+        if (removed)
+        {
+            cout << "Professor with AFM " << afm << " has been removed." << endl;
+            ofstream file("professors.csv");
+            if (!file.is_open())
+            {
+                cerr << "Error opening file for writing" << endl;
+                return;
+            }
+
+            // Write the header
+            file << "Name,Afm,Age" << endl;
+
+            // Write the remaining students to the file
+            for (const auto *professor : allProfessors)
+            {
+                file << professor->getName() << ","
+                     << professor->getAFM() << ","
+                     << professor->getAge() << endl;
+            }
+
+            file.close();
+        }
+        else
+        {
+            cout << "The AFM is not in the vector." << endl;
+        }
+    }
+
     void addProfessor(const string &name, const string &afm, int age)
     {
         // Open the students.csv file in append mode
@@ -536,6 +600,18 @@ int main()
     for (const auto *professor : secretary.getProfessors())
     {
         cout << "Name: " << professor->getName() << endl;
+    }
+
+    // Remove a Professor by AFM
+    afmToRemove = "500"; // Replace with an actual AFM from your loaded data
+    cout << "Removing professor with AFM: " << afmToRemove << endl;
+    secretary.removeProfessor(afmToRemove);
+
+    // Displaying loaded students after removal
+    cout << "Loaded Professors After Removal: " << endl;
+    for (const auto *professor : secretary.getProfessors())
+    {
+        cout << "AFM: " << professor->getAFM() << endl;
     }
 
     // Displaying loaded courses
