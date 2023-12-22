@@ -209,6 +209,20 @@ public:
     }
 };
 
+bool isAFMInStudents(
+    const vector<Student *> &vec,
+    const string &afm)
+{
+    for (const auto &student : vec)
+    {
+        if (student->getAFM() == afm)
+        {
+            return true; // AFM found in one of the students
+        }
+    }
+    return false; // AFM not found
+}
+
 class Secretary
 {
 private:
@@ -398,11 +412,84 @@ public:
 
         // Create a new Student object
         Student *newStudent = new Student();
-        newStudent->setName(name);
+        newStudent->setAfm(afm);
         // Assuming other properties (afm, age, etc.) are set through appropriate methods or constructors
 
         // Add the new Student to the allStudents vector
         allStudents.push_back(newStudent);
+
+        // Close the file
+        file.close();
+    }
+
+    void removeStudent(const string &afm)
+    {
+        bool removed = false;
+        for (auto it = allStudents.begin(); it != allStudents.end();)
+        {
+            if ((*it)->getAFM() == afm)
+            {
+                delete *it;                 // Free the memory of the student object
+                it = allStudents.erase(it); // Remove the student from the vector and update the iterator
+                removed = true;
+            }
+            else
+            {
+                ++it; // Only increment if not erased
+            }
+        }
+
+        if (removed)
+        {
+            cout << "Student with AFM " << afm << " has been removed." << endl;
+            // Rewrite the students.csv file without the removed student
+            ofstream file("students.csv");
+            if (!file.is_open())
+            {
+                cerr << "Error opening file for writing" << endl;
+                return;
+            }
+
+            // Write the header
+            file << "Name,Afm,Age,Current Semester,Accumulated Points" << endl;
+
+            // Write the remaining students to the file
+            for (const auto *student : allStudents)
+            {
+                file << student->getName() << ","
+                     << student->getAFM() << ","
+                     << student->getAge() << ","
+                     << "1,0" << endl; // Assuming default values for Current Semester and Accumulated Points
+            }
+
+            file.close();
+        }
+        else
+        {
+            cout << "The AFM is not in the vector." << endl;
+        }
+    }
+
+    void addProfessor(const string &name, const string &afm, int age)
+    {
+        // Open the students.csv file in append mode
+        ofstream file("professors.csv", ios::app);
+        if (!file.is_open())
+        {
+            cerr << "Error opening file for writing" << endl;
+            return;
+        }
+
+        // Write the new student's information to the file
+        file << name << "," << afm << "," << age << endl;
+
+        // Create a new Student object
+        Professor *newProfessor = new Professor();
+        newProfessor->setAfm(afm);
+        // Assuming other properties (afm, age, etc.) are set through appropriate methods or constructors
+
+        // Add the new Student to the allStudents vector
+        allProfessors.push_back(newProfessor);
 
         // Close the file
         file.close();
@@ -425,8 +512,20 @@ int main()
     secretary.loadProfessors();
     secretary.loadCourses();
 
-    // Displaying loaded students
-    cout << "Loaded Students: " << endl;
+    // Displaying loaded students before removal
+    cout << "Loaded Students Before Removal: " << endl;
+    for (const auto *student : secretary.getStudents())
+    {
+        cout << "AFM: " << student->getAFM() << endl;
+    }
+
+    // Remove a student by AFM
+    string afmToRemove = "005"; // Replace with an actual AFM from your loaded data
+    cout << "Removing student with AFM: " << afmToRemove << endl;
+    secretary.removeStudent(afmToRemove);
+
+    // Displaying loaded students after removal
+    cout << "Loaded Students After Removal: " << endl;
     for (const auto *student : secretary.getStudents())
     {
         cout << "AFM: " << student->getAFM() << endl;
@@ -439,11 +538,12 @@ int main()
         cout << "Name: " << professor->getName() << endl;
     }
 
-    // Displaying loaded professors
+    // Displaying loaded courses
     cout << "Loaded Courses: " << endl;
     for (const auto *course : secretary.getCourses())
     {
         cout << "Course Id: " << course->getCourseId() << endl;
     }
+
     return 0;
 }
