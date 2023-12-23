@@ -56,7 +56,6 @@ public:
     string getAFM() const { return afm; }            // Function to return the afm
     string getName() const { return name; }          // Function to return the name
     int getAge() const { return age; }               // Function to return the age
-    int getIfStudent() const { return isStudent; }   // Function to return If Student
     void setName(string newName) { name = newName; } // Function to set Name
     void setAfm(string newAfm) { afm = newAfm; }     // Function to set Afm
     void setAge(int newAge) { age = newAge; }        // Function to set Age
@@ -157,12 +156,22 @@ private:
     int currentSemester;
     int accumulatedPoints;
     int finalGrade;
-    bool graduated;
+    int graduated;
     vector<Course *> enrolledCourses;
 
 public:
     // Constructor for Student
-    Student() : currentSemester(0), accumulatedPoints(0), finalGrade(0), graduated(0) {}
+    Student(string name, string afm, int age, int newCurrentSemester, int newAccumulatedPoints,
+            int newFinalGrade, int newGraduated)
+    {
+        setName(name);
+        setAfm(afm);
+        setAge(age);
+        currentSemester = newCurrentSemester;
+        accumulatedPoints = newAccumulatedPoints;
+        finalGrade = newFinalGrade;
+        graduated = newGraduated;
+    }
     // Destructor
     ~Student() {}
 
@@ -205,6 +214,16 @@ public:
     int getAccumulatedPoints() const
     {
         return accumulatedPoints;
+    }
+
+    int getFinalGrade() const
+    {
+        return finalGrade;
+    }
+
+    int getGraduated() const
+    {
+        return graduated;
     }
 };
 
@@ -277,39 +296,32 @@ public:
             return;
         }
 
-        // Skip the first line (header)
-        getline(file, line);
+        getline(file, line); // Skip the first line (header)
 
         while (getline(file, line))
         {
             stringstream ss(line);
-            string name, afm;
-            int age;
+            string name, afm, age, currentSemester, finalGrade, accumulatedPoints, graduated;
 
             getline(ss, name, ',');
             getline(ss, afm, ',');
+            getline(ss, age, ',');
+            getline(ss, currentSemester, ',');
+            getline(ss, finalGrade, ',');
+            getline(ss, accumulatedPoints, ',');
+            getline(ss, graduated, ',');
 
-            ss >> age; // Assuming further parsing for age, etc.
-
-            // Trim the AFM string
+            name = trim(name);
             afm = trim(afm);
+            age = trim(age);
+            currentSemester = trim(currentSemester);
+            accumulatedPoints = trim(accumulatedPoints);
+            finalGrade = trim(finalGrade);
+            graduated = trim(graduated);
 
-            // Debug output
-            cout << "Debug: AFM = '" << afm << "'" << endl;
-
-            if (afm.empty())
-            {
-                cerr << "Warning: Empty AFM found, skipping line." << endl;
-                continue; // Skip this line if AFM is empty
-            }
-
-            Student *newStudent = new Student();
-            newStudent->setAfm(afm);
-            newStudent->setName(name);
-
-            // Set other properties as needed
-
+            Student *newStudent = new Student(name, afm, stoi(age), stoi(currentSemester), stoi(accumulatedPoints), stoi(finalGrade), stoi(graduated));
             allStudents.push_back(newStudent);
+            cout << name << "," << afm << "," << age << "," << currentSemester << "," << accumulatedPoints << "," << finalGrade << "," << graduated << endl;
         }
 
         file.close();
@@ -429,9 +441,7 @@ public:
         file << name << "," << afm << "," << age << "," << 1 << "," << 0 << endl;
 
         // Create a new Student object
-        Student *newStudent = new Student();
-        newStudent->setAfm(afm);
-        // Assuming other properties (afm, age, etc.) are set through appropriate methods or constructors
+        Student *newStudent = new Student(name, afm, age, 1, 0, 0, 0);
 
         // Add the new Student to the allStudents vector
         allStudents.push_back(newStudent);
@@ -469,7 +479,7 @@ public:
             }
 
             // Write the header
-            file << "Name,Afm,Age,Current Semester,Accumulated Points" << endl;
+            file << "name,afm,age,currentSemester,accumulatedPoints,finalGrade,graduated" << endl;
 
             // Write the remaining students to the file
             for (const auto *student : allStudents)
@@ -477,7 +487,10 @@ public:
                 file << student->getName() << ","
                      << student->getAFM() << ","
                      << student->getAge() << ","
-                     << "1,0" << endl; // Assuming default values for Current Semester and Accumulated Points
+                     << student->getCurrentSemester() << ","
+                     << student->getAccumulatedPoints() << ","
+                     << student->getFinalGrade() << ","
+                     << student->getGraduated() << endl;
             }
 
             file.close();
@@ -573,8 +586,8 @@ int main()
 
     // Load students and professors from CSV files
     secretary.loadStudents();
-    secretary.loadProfessors();
-    secretary.loadCourses();
+    // secretary.loadProfessors();
+    // secretary.loadCourses();
 
     // Displaying loaded students before removal
     cout << "Loaded Students Before Removal: " << endl;
@@ -593,32 +606,6 @@ int main()
     for (const auto *student : secretary.getStudents())
     {
         cout << "AFM: " << student->getAFM() << endl;
-    }
-
-    // Displaying loaded professors
-    cout << "Loaded Professors: " << endl;
-    for (const auto *professor : secretary.getProfessors())
-    {
-        cout << "Name: " << professor->getName() << endl;
-    }
-
-    // Remove a Professor by AFM
-    afmToRemove = "500"; // Replace with an actual AFM from your loaded data
-    cout << "Removing professor with AFM: " << afmToRemove << endl;
-    secretary.removeProfessor(afmToRemove);
-
-    // Displaying loaded students after removal
-    cout << "Loaded Professors After Removal: " << endl;
-    for (const auto *professor : secretary.getProfessors())
-    {
-        cout << "AFM: " << professor->getAFM() << endl;
-    }
-
-    // Displaying loaded courses
-    cout << "Loaded Courses: " << endl;
-    for (const auto *course : secretary.getCourses())
-    {
-        cout << "Course Id: " << course->getCourseId() << endl;
     }
 
     return 0;

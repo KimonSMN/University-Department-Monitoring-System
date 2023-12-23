@@ -1,6 +1,5 @@
-Name,Afm,Age,Current Semester,Accumulated Points
-Kimon,001,10,1,1
-Nikos,002,20,2,2
-Petros,003,30,3,3
-Kostas,004,40,4,4
-Kostas,005,40,4,4
+name,afm,age,currentSemester,accumulatedPoints,finalGrade,graduated
+Kimon,001,10,1,5,1,0
+Nikos,002,20,2,5,2,1
+Petros,003,30,3,5,3,0
+Kostas,004,40,4,5,4,1
