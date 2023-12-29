@@ -307,8 +307,8 @@ public:
             getline(ss, afm, ',');
             getline(ss, age, ',');
             getline(ss, currentSemester, ',');
-            getline(ss, finalGrade, ',');
             getline(ss, accumulatedPoints, ',');
+            getline(ss, finalGrade, ',');
             getline(ss, graduated, ',');
 
             name = trim(name);
@@ -438,7 +438,7 @@ public:
         }
 
         // Write the new student's information to the file
-        file << name << "," << afm << "," << age << "," << 1 << "," << 0 << endl;
+        file << name << "," << afm << "," << age << "," << 1 << "," << 0 << "," << 0 << "," << 0 << endl;
 
         // Create a new Student object
         Student *newStudent = new Student(name, afm, age, 1, 0, 0, 0);
@@ -583,6 +583,102 @@ int main()
 {
     // Create an instance of Secretary
     Secretary secretary;
+
+    int loginOption;
+    int methodOption;
+    string currentSelection; // Afm
+    cout << "\n\t Welcome to my University Department Monitor System" << endl;
+
+    cout << "1. Login As Student" << endl;
+    cout << "2. Login As Professor" << endl;
+    cout << "3. Login As Secretary" << endl;
+    cout << "Give option 1 - 3 : ";
+    cin >> loginOption;
+
+    switch (loginOption)
+    {
+    case 1: // Student
+        cout << "\tYou are logged in as a Student" << endl;
+        cout << "Give your AFM: ";
+        cin >> currentSelection;
+
+        cout << "1. Enroll self to course" << endl;
+        cout << "2. Calculate Accumulated Points" << endl;
+        cout << "3. Check graduation eligibility" << endl;
+        cout << "Give option 1 - 3 : " << endl;
+        cin >> methodOption;
+
+        switch (methodOption)
+        {
+        case 1:
+            // Enroll student to course
+            break;
+        case 2:
+            // Calculate Accumulated Points
+            break;
+        case 3:
+            // Check graduation eligibility
+            break;
+        }
+        break;
+
+    case 2: // Professor
+        cout << "\tYou are logged in as a Professor" << endl;
+        cout << "Give your AFM: ";
+        cin >> currentSelection;
+
+        cout << "1. Set Finals grade for student" << endl;
+        cout << "2. Conduct Finals Exam" << endl; // Make it look cool! ex. Loading Final scores... Students are given random score.
+        cout << "Give option 1 - 2 : " << endl;
+        cin >> methodOption;
+
+        switch (methodOption)
+        {
+        case 1:
+            // Set Finals grade for student
+            break;
+        case 2:
+            // Conduct Finals Exam
+            break;
+        }
+        break;
+
+    case 3: // Secretary
+        cout << "\tYou are logged in as the Secretary" << endl;
+
+        ////////// Student Management //////////
+        cout << "1. Add new student" << endl;
+        cout << "2. Remove Student" << endl;
+        cout << "3. Update Student Information" << endl;
+        cout << "4. List Students" << endl;
+        cout << "5. Enroll Student in Course" << endl;
+        ////////// Professor Management //////////
+        cout << "6. Add Professor" << endl;
+        cout << "7. Remove Professor" << endl;
+        cout << "8. Update Professor Information" << endl;
+        cout << "9. List Professors" << endl;
+        cout << "10. Assign Professor to Course" << endl;
+        ////////// Course Management //////////
+        cout << "11. Add Course" << endl;
+        cout << "12. Remove Course" << endl;
+        cout << "13. Update Course Details" << endl;
+        cout << "14. List Courses" << endl;
+        cout << "15. Display Every Functionality" << endl;
+        cout << "Give option 1 - 15 : " << endl;
+        cin >> methodOption;
+
+        switch (methodOption)
+        {
+        case 1:
+            //
+            break;
+        case 2:
+            //
+            break;
+        }
+        break;
+    }
+    secretary.addStudent("Giannis", "005", 19);
 
     // Load students and professors from CSV files
     secretary.loadStudents();
