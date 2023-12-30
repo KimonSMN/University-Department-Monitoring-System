@@ -584,9 +584,8 @@ int main()
     // Create an instance of Secretary
     Secretary secretary;
 
-    int loginOption;
-    int methodOption;
-    string currentSelection; // Afm
+    int loginOption, methodOption, age;
+    string name, afm;
     cout << "\n\t Welcome to my University Department Monitor System" << endl;
 
     cout << "1. Login As Student" << endl;
@@ -600,7 +599,7 @@ int main()
     case 1: // Student
         cout << "\tYou are logged in as a Student" << endl;
         cout << "Give your AFM: ";
-        cin >> currentSelection;
+        cin >> afm;
 
         cout << "1. Enroll self to course" << endl;
         cout << "2. Calculate Accumulated Points" << endl;
@@ -625,7 +624,7 @@ int main()
     case 2: // Professor
         cout << "\tYou are logged in as a Professor" << endl;
         cout << "Give your AFM: ";
-        cin >> currentSelection;
+        cin >> afm;
 
         cout << "1. Set Finals grade for student" << endl;
         cout << "2. Conduct Finals Exam" << endl; // Make it look cool! ex. Loading Final scores... Students are given random score.
@@ -669,19 +668,65 @@ int main()
 
         switch (methodOption)
         {
-        case 1:
+        case 1: // Add Student
+            cout << "Enter Name: " << endl;
+            cin >> name;
+            cout << "Enter AFM: " << endl;
+            cin >> afm;
+            cout << "Enter Age: " << endl;
+            cin >> age;
+            secretary.addStudent(name, afm, age);
+            break;
+        case 2: // Remove Student
+            cout << "Enter AFM to remove: " << endl;
+            cin >> afm;
+            secretary.removeStudent(afm);
+            break;
+        case 3:
+            // Edit Student details
+            break;
+        case 4: // Display Students
+            secretary.loadStudents();
+            break;
+        case 5:
             //
             break;
-        case 2:
+        case 6:
+            //
+            break;
+        case 7:
+            //
+            break;
+        case 8:
+            //
+            break;
+        case 9:
+            //
+            break;
+        case 10:
+            //
+            break;
+        case 11:
+            //
+            break;
+        case 12:
+            //
+            break;
+        case 13:
+            //
+            break;
+        case 14:
+            //
+            break;
+        case 15:
             //
             break;
         }
         break;
     }
-    secretary.addStudent("Giannis", "005", 19);
 
     // Load students and professors from CSV files
-    secretary.loadStudents();
+
     // secretary.loadProfessors();
     // secretary.loadCourses();
 
