@@ -206,6 +206,16 @@ public:
         accumulatedPoints = newAccumulatedPoints;
     }
 
+    void setFinalGrade(int newFinalGrade)
+    {
+        finalGrade = newFinalGrade;
+    }
+
+    void setGraduated(bool isGraduated)
+    {
+        graduated = isGraduated;
+    }
+
     int getCurrentSemester() const
     {
         return currentSemester;
@@ -501,6 +511,101 @@ public:
         }
     }
 
+    void editStudent(const string &afm)
+    {
+        Student *studentToEdit = nullptr;
+
+        // Find the student in the allStudents vector
+        for (auto &student : allStudents)
+        {
+            if (student->getAFM() == afm)
+            {
+                studentToEdit = student;
+                break;
+            }
+        }
+
+        if (!studentToEdit)
+        {
+            cout << "Student with AFM " << afm << " not found." << endl;
+            return;
+        }
+
+        string newName;
+        int newAge, newCurrentSemester, newAccumulatedPoints, newFinalGrade;
+        bool newGraduated;
+        int change;
+
+        cout << "What would you like to change on student with afm: " << afm << endl;
+        cout << "1. Name" << endl
+             << "2. Age" << endl
+             << "3. Current Semester" << endl
+             << "4. Accumulated Points" << endl
+             << "5. Final Grade" << endl
+             << "6. Gratuated" << endl
+             << "Enter 1-6: " << endl;
+
+        cin >> change;
+
+        switch (change)
+        {
+        case 1:
+            cout << "Enter new Name: ";
+            cin >> newName;
+            studentToEdit->setName(newName);
+            break;
+        case 2:
+            cout << "Enter new Age: ";
+            cin >> newAge;
+            studentToEdit->setAge(newAge);
+            break;
+        case 3:
+            cout << "Enter new Current Semester: ";
+            cin >> newCurrentSemester;
+            studentToEdit->setCurrentSemester(newCurrentSemester);
+            break;
+        case 4:
+            cout << "Enter new Accumulated Points: ";
+            cin >> newAccumulatedPoints;
+            studentToEdit->setAccumulatedPoints(newAccumulatedPoints);
+            break;
+        case 5:
+            cout << "Enter new Final Grade: ";
+            cin >> newFinalGrade;
+            studentToEdit->setFinalGrade(newFinalGrade);
+            break;
+        case 6:
+            cout << "Enter new Gratuated: ";
+            cin >> newGraduated;
+            studentToEdit->setGraduated(newGraduated);
+            break;
+        }
+
+        // Rewrite the students.csv file with updated details
+        ofstream file("students.csv");
+        if (!file.is_open())
+        {
+            cerr << "Error opening file for writing" << endl;
+            return;
+        }
+
+        file << "Name,Afm,Age,Current Semester,Accumulated Points,Final Grade,Graduated" << endl;
+
+        for (const auto &student : allStudents)
+        {
+            file << student->getName() << ","
+                 << student->getAFM() << ","
+                 << student->getAge() << ","
+                 << student->getCurrentSemester() << ","
+                 << student->getAccumulatedPoints() << ","
+                 << student->getFinalGrade() << ","
+                 << student->getGraduated() << endl;
+        }
+
+        file.close();
+        cout << "Student details updated successfully." << endl;
+    }
+
     void removeProfessor(const string &afm)
     {
         bool removed = false;
@@ -579,175 +684,174 @@ public:
 
 int Person::counter = 0;
 
+// int main()
+// {
+//     // Create an instance of Secretary
+//     Secretary secretary;
+
+//     int loginOption, methodOption, age;
+//     string name, afm;
+//     cout << "\n\t Welcome to my University Department Monitor System" << endl;
+
+//     cout << "1. Login As Student" << endl;
+//     cout << "2. Login As Professor" << endl;
+//     cout << "3. Login As Secretary" << endl;
+//     cout << "Give option 1 - 3 : ";
+//     cin >> loginOption;
+
+//     switch (loginOption)
+//     {
+//     case 1: // Student
+//         cout << "\tYou are logged in as a Student" << endl;
+//         cout << "Give your AFM: ";
+//         cin >> afm;
+
+//         cout << "1. Enroll self to course" << endl;
+//         cout << "2. Calculate Accumulated Points" << endl;
+//         cout << "3. Check graduation eligibility" << endl;
+//         cout << "Give option 1 - 3 : " << endl;
+//         cin >> methodOption;
+
+//         switch (methodOption)
+//         {
+//         case 1:
+//             // Enroll student to course
+//             break;
+//         case 2:
+//             // Calculate Accumulated Points
+//             break;
+//         case 3:
+//             // Check graduation eligibility
+//             break;
+//         }
+//         break;
+
+//     case 2: // Professor
+//         cout << "\tYou are logged in as a Professor" << endl;
+//         cout << "Give your AFM: ";
+//         cin >> afm;
+
+//         cout << "1. Set Finals grade for student" << endl;
+//         cout << "2. Conduct Finals Exam" << endl; // Make it look cool! ex. Loading Final scores... Students are given random score.
+//         cout << "Give option 1 - 2 : " << endl;
+//         cin >> methodOption;
+
+//         switch (methodOption)
+//         {
+//         case 1:
+//             // Set Finals grade for student
+//             break;
+//         case 2:
+//             // Conduct Finals Exam
+//             break;
+//         }
+//         break;
+
+//     case 3: // Secretary
+//         cout << "\tYou are logged in as the Secretary" << endl;
+
+//         ////////// Student Management //////////
+//         cout << "1. Add new student" << endl;
+//         cout << "2. Remove Student" << endl;
+//         cout << "3. Update Student Information" << endl;
+//         cout << "4. List Students" << endl;
+//         cout << "5. Enroll Student in Course" << endl;
+//         ////////// Professor Management //////////
+//         cout << "6. Add Professor" << endl;
+//         cout << "7. Remove Professor" << endl;
+//         cout << "8. Update Professor Information" << endl;
+//         cout << "9. List Professors" << endl;
+//         cout << "10. Assign Professor to Course" << endl;
+//         ////////// Course Management //////////
+//         cout << "11. Add Course" << endl;
+//         cout << "12. Remove Course" << endl;
+//         cout << "13. Update Course Details" << endl;
+//         cout << "14. List Courses" << endl;
+//         cout << "15. Display Every Functionality" << endl;
+//         cout << "Give option 1 - 15 : " << endl;
+//         cin >> methodOption;
+
+//         switch (methodOption)
+//         {
+//         case 1: // Add Student
+//             cout << "Enter Name: " << endl;
+//             cin >> name;
+//             cout << "Enter AFM: " << endl;
+//             cin >> afm;
+//             cout << "Enter Age: " << endl;
+//             cin >> age;
+//             secretary.addStudent(name, afm, age);
+//             break;
+//         case 2: // Remove Student
+//             cout << "Enter AFM to remove: " << endl;
+//             cin >> afm;
+//             secretary.removeStudent(afm);
+//             break;
+//         case 3:
+//             // Edit Student details
+//             break;
+//         case 4: // Display Students
+//             secretary.loadStudents();
+//             break;
+//         case 5:
+//             //
+//             break;
+//         case 6:
+//             //
+//             break;
+//         case 7:
+//             //
+//             break;
+//         case 8:
+//             //
+//             break;
+//         case 9:
+//             //
+//             break;
+//         case 10:
+//             //
+//             break;
+//         case 11:
+//             //
+//             break;
+//         case 12:
+//             //
+//             break;
+//         case 13:
+//             //
+//             break;
+//         case 14:
+//             //
+//             break;
+//         case 15:
+//             //
+//             break;
+//         }
+//         break;
+//     }
+
+//     // Load students and professors from CSV files
+
+//     // secretary.loadProfessors();
+//     // secretary.loadCourses();
+
+//     // Displaying loaded students
+//     cout << "Loaded Students: " << endl;
+//     for (const auto *student : secretary.getStudents())
+//     {
+//         cout << "AFM: " << student->getAFM() << endl;
+//     }
+
+//     return 0;
+// }
+
 int main()
 {
-    // Create an instance of Secretary
     Secretary secretary;
+    secretary.loadStudents(); // Make sure students are loaded
 
-    int loginOption, methodOption, age;
-    string name, afm;
-    cout << "\n\t Welcome to my University Department Monitor System" << endl;
-
-    cout << "1. Login As Student" << endl;
-    cout << "2. Login As Professor" << endl;
-    cout << "3. Login As Secretary" << endl;
-    cout << "Give option 1 - 3 : ";
-    cin >> loginOption;
-
-    switch (loginOption)
-    {
-    case 1: // Student
-        cout << "\tYou are logged in as a Student" << endl;
-        cout << "Give your AFM: ";
-        cin >> afm;
-
-        cout << "1. Enroll self to course" << endl;
-        cout << "2. Calculate Accumulated Points" << endl;
-        cout << "3. Check graduation eligibility" << endl;
-        cout << "Give option 1 - 3 : " << endl;
-        cin >> methodOption;
-
-        switch (methodOption)
-        {
-        case 1:
-            // Enroll student to course
-            break;
-        case 2:
-            // Calculate Accumulated Points
-            break;
-        case 3:
-            // Check graduation eligibility
-            break;
-        }
-        break;
-
-    case 2: // Professor
-        cout << "\tYou are logged in as a Professor" << endl;
-        cout << "Give your AFM: ";
-        cin >> afm;
-
-        cout << "1. Set Finals grade for student" << endl;
-        cout << "2. Conduct Finals Exam" << endl; // Make it look cool! ex. Loading Final scores... Students are given random score.
-        cout << "Give option 1 - 2 : " << endl;
-        cin >> methodOption;
-
-        switch (methodOption)
-        {
-        case 1:
-            // Set Finals grade for student
-            break;
-        case 2:
-            // Conduct Finals Exam
-            break;
-        }
-        break;
-
-    case 3: // Secretary
-        cout << "\tYou are logged in as the Secretary" << endl;
-
-        ////////// Student Management //////////
-        cout << "1. Add new student" << endl;
-        cout << "2. Remove Student" << endl;
-        cout << "3. Update Student Information" << endl;
-        cout << "4. List Students" << endl;
-        cout << "5. Enroll Student in Course" << endl;
-        ////////// Professor Management //////////
-        cout << "6. Add Professor" << endl;
-        cout << "7. Remove Professor" << endl;
-        cout << "8. Update Professor Information" << endl;
-        cout << "9. List Professors" << endl;
-        cout << "10. Assign Professor to Course" << endl;
-        ////////// Course Management //////////
-        cout << "11. Add Course" << endl;
-        cout << "12. Remove Course" << endl;
-        cout << "13. Update Course Details" << endl;
-        cout << "14. List Courses" << endl;
-        cout << "15. Display Every Functionality" << endl;
-        cout << "Give option 1 - 15 : " << endl;
-        cin >> methodOption;
-
-        switch (methodOption)
-        {
-        case 1: // Add Student
-            cout << "Enter Name: " << endl;
-            cin >> name;
-            cout << "Enter AFM: " << endl;
-            cin >> afm;
-            cout << "Enter Age: " << endl;
-            cin >> age;
-            secretary.addStudent(name, afm, age);
-            break;
-        case 2: // Remove Student
-            cout << "Enter AFM to remove: " << endl;
-            cin >> afm;
-            secretary.removeStudent(afm);
-            break;
-        case 3:
-            // Edit Student details
-            break;
-        case 4: // Display Students
-            secretary.loadStudents();
-            break;
-        case 5:
-            //
-            break;
-        case 6:
-            //
-            break;
-        case 7:
-            //
-            break;
-        case 8:
-            //
-            break;
-        case 9:
-            //
-            break;
-        case 10:
-            //
-            break;
-        case 11:
-            //
-            break;
-        case 12:
-            //
-            break;
-        case 13:
-            //
-            break;
-        case 14:
-            //
-            break;
-        case 15:
-            //
-            break;
-        }
-        break;
-    }
-
-    // Load students and professors from CSV files
-
-    // secretary.loadProfessors();
-    // secretary.loadCourses();
-
-    // Displaying loaded students before removal
-    cout << "Loaded Students Before Removal: " << endl;
-    for (const auto *student : secretary.getStudents())
-    {
-        cout << "AFM: " << student->getAFM() << endl;
-    }
-
-    // Remove a student by AFM
-    string afmToRemove = "005"; // Replace with an actual AFM from your loaded data
-    cout << "Removing student with AFM: " << afmToRemove << endl;
-    secretary.removeStudent(afmToRemove);
-
-    // Displaying loaded students after removal
-    cout << "Loaded Students After Removal: " << endl;
-    for (const auto *student : secretary.getStudents())
-    {
-        cout << "AFM: " << student->getAFM() << endl;
-    }
+    string afmToEdit = "001"; // Specify the AFM of the student you want to edit
+    secretary.editStudent(afmToEdit);
 
     return 0;
 }
