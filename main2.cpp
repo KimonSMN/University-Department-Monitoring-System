@@ -308,9 +308,26 @@ public:
     // Destructor
     ~Professor() {}
 
+    void pushToVector(Course *course)
+    {
+        taughtCourses.push_back(course);
+    }
     void assignToCourse(Course *course) // Assigns Self to Course
     {
         taughtCourses.push_back(course);
+
+        // Open the professorsToCourses.csv file in append mode
+        ofstream file("professorsToCourses.csv", ios::app);
+        if (!file.is_open())
+        {
+            cerr << "Error opening file for writing" << endl;
+            return;
+        }
+
+        // Write the new student's information to the file
+        file << getAFM() << "," << course->getCourseId();
+
+        file.close();
     }
 };
 
@@ -338,6 +355,54 @@ public:
         for (Course *course : allCourses)
         {
             delete course;
+        }
+    }
+
+    void loadTaughtCourses(Professor *professor)
+    {
+        ifstream file("professorsToCourses.csv");
+        string line;
+
+        if (!file.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        getline(file, line); // Skip the first line (header)
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string professorAfm, courseId;
+
+            getline(ss, professorAfm, ',');
+            getline(ss, courseId, ',');
+
+            professorAfm = trim(professorAfm);
+            courseId = trim(courseId);
+
+            Course *courseToFind = nullptr;
+
+            for (auto &course : allCourses)
+            {
+                if (to_string(course->getCourseId()) == courseId)
+                {
+                    courseToFind = course;
+                    break;
+                }
+            }
+
+            if (!courseToFind)
+            {
+                cout << "Course with Id " << courseId << " not found." << endl;
+                return;
+            }
+
+            if (professorAfm == professor->getAFM())
+            {
+                professor->pushToVector(courseToFind);
+            }
         }
     }
 
@@ -465,10 +530,74 @@ public:
             student->enrollInCourse(course);
     }
 
-    void assignProfessor(Professor *professor, Course *course) // Assigns Professor to Course
+    void assignProfessor(const string &afm, int courseId) // Assigns Professor to Course
     {
-        if (professor && course) // Check if the pointers are not null
-            professor->assignToCourse(course);
+
+        Professor *professorToFind = nullptr;
+        for (auto &professor : allProfessors)
+        {
+            if (professor->getAFM() == afm)
+            {
+                professorToFind = professor;
+                break;
+            }
+        }
+
+        Course *courseToFind = nullptr;
+        for (auto &course : allCourses)
+        {
+            if (course->getCourseId() == courseId)
+            {
+                courseToFind = course;
+                break;
+            }
+        }
+
+        if (professorToFind && courseToFind) // Check if the pointers are not null
+            professorToFind->assignToCourse(courseToFind);
+    }
+
+    void absolveProfessor(const string &afm, const string &courseId)
+    {
+        ifstream file("professorsToCourses.csv");
+        string line;
+
+        if (!file.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        // Create a temporary file
+        ofstream tempFile("temp.csv");
+
+        int index = 1;
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string professorAfm, fileCourseId;
+
+            getline(ss, professorAfm, ',');
+            getline(ss, fileCourseId, ',');
+
+            professorAfm = trim(professorAfm);
+            fileCourseId = trim(fileCourseId);
+            if (!(professorAfm == afm && courseId == fileCourseId))
+            {
+                tempFile << line << endl;
+            }
+            index++;
+        }
+
+        // Close both the files
+        file.close();
+        tempFile.close();
+
+        // Remove the original file
+        remove("professorsToCourses.csv");
+        removeEmptyLines("temp.csv");
+        // Rename the temporary file to the original file name
+        rename("temp.csv", "professorsToCourses.csv");
     }
 
     void addStudent(const string &name, const string &afm, int age)
@@ -808,6 +937,7 @@ int Person::counter = 0;
 
 int main()
 {
+    removeEmptyLines("professorsToCourses.csv");
     // Create an instance of Secretary
     Secretary secretary;
 
@@ -889,13 +1019,14 @@ int main()
         cout << "7. Update Professor Information" << endl;
         cout << "8. List Professors" << endl;
         cout << "9. Assign Professor to Course" << endl;
+        cout << "10. Unassign Professor from Course" << endl;
         ////////// Course Management //////////
-        cout << "10. Add Course" << endl;
-        cout << "11. Remove Course" << endl;
-        cout << "12. Update Course Details" << endl; // Also able to move course's semseter
-        cout << "13. List Courses" << endl;
-        cout << "14. Display Every Functionality" << endl;
-        cout << "Give option 1 - 14 : " << endl;
+        cout << "11. Add Course" << endl;
+        cout << "12. Remove Course" << endl;
+        cout << "13. Update Course Details" << endl; // Also able to move course's semseter
+        cout << "14. List Courses" << endl;
+        cout << "15. Display Every Functionality" << endl;
+        cout << "Give option 1 - 15 : " << endl;
         cin >> methodOption;
 
         switch (methodOption)
@@ -946,9 +1077,20 @@ int main()
             break;
         case 9:
             // Assign Professor to Course
-
+            cout << "Enter Professor AFM: " << endl;
+            cin >> afm;
+            cout << "Enter Course Id: " << endl;
+            cin >> courseId;
+            secretary.assignProfessor(afm, courseId);
             break;
-        case 10: // Add new Course
+        case 10:
+            cout << "Enter Professor AFM: " << endl;
+            cin >> afm;
+            cout << "Enter Course Id: " << endl;
+            cin >> courseId;
+            secretary.absolveProfessor(afm, to_string(courseId));
+            break;
+        case 11: // Add new Course
             cout << "Enter Course Id: " << endl;
             cin >> courseId;
             cout << "Enter Course Name: " << endl;
@@ -961,17 +1103,17 @@ int main()
             cin >> mandatory;
             secretary.addCourse(courseId, courseName, semester, points, mandatory);
             break;
-        case 11:
-            //
-            break;
         case 12:
             //
             break;
-        case 13: // Display Courses
+        case 13:
+            //
+            break;
+        case 14: // Display Courses
             secretary.loadCourses();
 
             break;
-        case 14:
+        case 15:
             //
             break;
         }
