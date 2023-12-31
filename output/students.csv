@@ -1,4 +1,4 @@
-Name,Afm,Age,Current Semester,Accumulated Points,Final Grade,Graduated
+name,afm,age,currentSemester,accumulatedPoints,finalGrade,graduated
 Isabella,s000,19,3,96,5,0
 Noah,s001,24,3,96,1,0
 Emma,s002,19,4,93,6,0
@@ -99,4 +99,3 @@ Liam,s096,22,2,60,7,0
 Liam,s097,24,4,83,0,0
 Liam,s098,24,2,21,0,0
 Ava,s099,18,1,30,7,0
-Test,001,18,1,0,0,0
