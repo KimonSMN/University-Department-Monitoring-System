@@ -234,7 +234,20 @@ public:
     {
         if (course->semester <= currentSemester) // If the semester is equal or less than the currentSemester
         {
-            enrolledCourses.push_back(course);
+            // enrolledCourses.push_back(course);
+
+            // Open the studentsToCourses.csv file in append mode
+            ofstream file("studentsToCourses.csv", ios::app);
+            if (!file.is_open())
+            {
+                cerr << "Error opening file for writing" << endl;
+                return;
+            }
+
+            // Write the new student's information to the file
+            file << getAFM() << "," << course->getCourseId();
+
+            file.close();
         }
     }
 
@@ -524,10 +537,30 @@ public:
         file.close();
     }
 
-    void enrollStudent(Student *student, Course *course) // Assigns student to Course
+    void enrollStudent(const string &afm, int courseId) // Assigns student to Course
     {
-        if (student && course) // Check if the pointers are not null
-            student->enrollInCourse(course);
+        Student *studentToFind = nullptr;
+        for (auto &student : allStudents)
+        {
+            if (student->getAFM() == afm)
+            {
+                studentToFind = student;
+                break;
+            }
+        }
+
+        Course *courseToFind = nullptr;
+        for (auto &course : allCourses)
+        {
+            if (course->getCourseId() == courseId)
+            {
+                courseToFind = course;
+                break;
+            }
+        }
+
+        if (studentToFind && courseToFind) // Check if the pointers are not null
+            studentToFind->enrollInCourse(courseToFind);
     }
 
     void assignProfessor(const string &afm, int courseId) // Assigns Professor to Course
@@ -938,6 +971,8 @@ int Person::counter = 0;
 int main()
 {
     removeEmptyLines("professorsToCourses.csv");
+    removeEmptyLines("studentsToCourses.csv");
+
     // Create an instance of Secretary
     Secretary secretary;
 
@@ -974,6 +1009,9 @@ int main()
         {
         case 1:
             // Enroll student to course
+            cout << "Give the Course Id: " << endl;
+            cin >> courseId;
+            secretary.enrollStudent(afm, courseId);
             break;
         case 2:
             // Calculate Accumulated Points
@@ -1067,7 +1105,7 @@ int main()
             cin >> afm;
             secretary.removeProfessor(afm);
             break;
-        case 7: // Edit Professor Details // HAVE TO ALSO FIX FUNCTION TO BE ALBE TO EDIT COURSES
+        case 7: // Edit Professor Details
             cout << "Enter AFM to Edit: " << endl;
             cin >> afm;
             secretary.editProfessor(afm);
