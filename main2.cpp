@@ -203,6 +203,7 @@ public:
     void setName(string newName) { courseName = newName; }  // Function to set Name
     string getName() const { return courseName; }           // Function to return Name
     int getCourseId() const { return courseId; }            // Function to return Course Id
+    int getPoints() const { return points; }                // Function to return Points
 };
 
 class Student : public Person
@@ -961,6 +962,44 @@ public:
         file.close();
     }
 
+    int getAccumulatedPoints(const string &afm)
+    {
+        ifstream file("studentsToCourses.csv");
+        string line;
+        int points = 0;
+
+        if (!file.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return 0;
+        }
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string studentAfm, courseId, grade;
+
+            getline(ss, studentAfm, ',');
+            getline(ss, courseId, ',');
+            getline(ss, grade, ',');
+
+            courseId = trim(courseId);
+            grade = trim(grade);
+            if (studentAfm == afm && stoi(grade) >= 5)
+            {
+                for (auto &course : allCourses)
+                {
+                    if (course->getCourseId() == stoi(courseId))
+                    {
+                        points += course->getPoints();
+                        break;
+                    }
+                }
+            }
+        }
+        return points;
+    }
+
     const vector<Student *> &getStudents() const { return allStudents; }       // Getter for allStudents
     const vector<Professor *> &getProfessors() const { return allProfessors; } // Getter for allProfessors
     const vector<Course *> &getCourses() const { return allCourses; }          // Getter for allCourses
@@ -1015,6 +1054,7 @@ int main()
             break;
         case 2:
             // Calculate Accumulated Points
+            cout << secretary.getAccumulatedPoints(afm);
             break;
         case 3:
             // Check graduation eligibility
