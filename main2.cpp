@@ -199,12 +199,15 @@ public:
     // Destructor
     ~Course() {}
 
-    void setId(int newCourseId) { courseId = newCourseId; } // Function to set Name
-    void setName(string newName) { courseName = newName; }  // Function to set Name
-    int getCourseId() const { return courseId; }            // Function to return Course Id
-    string getName() const { return courseName; }           // Function to return Name
-    int getSemester() const { return semester; }            // Function to return Semeseter
-    int getPoints() const { return points; }                // Function to return Points
+    void setId(int newCourseId) { courseId = newCourseId; }            // Function to set Name
+    void setName(string newName) { courseName = newName; }             // Function to set Name
+    void setSemester(int newSemester) { semester = newSemester; }      // Function to set Semester
+    void setPoints(int newPoints) { points = newPoints; }              // Function to set Points
+    void setMandatory(bool newMandatory) { mandatory = newMandatory; } // Function to set Mandatory
+    int getCourseId() const { return courseId; }                       // Function to return Course Id
+    string getName() const { return courseName; }                      // Function to return Name
+    int getSemester() const { return semester; }                       // Function to return Semeseter
+    int getPoints() const { return points; }                           // Function to return Points
     bool getMandatory() const { return mandatory; }
 };
 
@@ -1046,6 +1049,84 @@ public:
         file.close();
     }
 
+    void editCourse(int courseId)
+    {
+        Course *courseToEdit = nullptr;
+
+        // Find the course in the allCourses vector
+        for (auto &course : allCourses)
+        {
+            if (course->getCourseId() == courseId)
+            {
+                courseToEdit = course;
+                break;
+            }
+        }
+
+        if (!courseToEdit)
+        {
+            cout << "Course with courseId " << courseId << " not found." << endl;
+            return;
+        }
+
+        string newCourseName;
+        int newSemester, newPoints, newMandatory, change;
+
+        cout << "What would you like to change on Course with courseId: " << courseId << endl;
+        cout << "1. Name" << endl
+             << "2. Semester" << endl
+             << "3. Points" << endl
+             << "4. Mandatory" << endl
+             << "Enter 1-4: " << endl;
+        cin >> change;
+
+        switch (change)
+        {
+        case 1:
+            cout << "Enter new Name: ";
+            cin >> newCourseName;
+            courseToEdit->setName(newCourseName);
+            break;
+        case 2:
+            cout << "Enter new Semester: ";
+            cin >> newSemester;
+            courseToEdit->setSemester(newSemester);
+            break;
+        case 3:
+            cout << "Enter new Points: ";
+            cin >> newPoints;
+            courseToEdit->setPoints(newPoints);
+            break;
+        case 4:
+            cout << "Enter new Mandatory: ";
+            cin >> newMandatory;
+            courseToEdit->setMandatory(newMandatory);
+            break;
+        }
+
+        // Rewrite the courses.csv file with updated details
+        ofstream file("courses.csv");
+        if (!file.is_open())
+        {
+            cerr << "Error opening file for writing" << endl;
+            return;
+        }
+
+        file << "courseId,courseName,semester,points,mandatory" << endl;
+
+        for (const auto &course : allCourses)
+        {
+            file << course->getCourseId() << ","
+                 << course->getName() << ","
+                 << course->getSemester() << ","
+                 << course->getPoints() << ","
+                 << course->getMandatory() << endl;
+        }
+
+        file.close();
+        cout << "Course details updated successfully." << endl;
+    }
+
     void removeCourse(int courseId)
     {
         bool removed = false;
@@ -1343,30 +1424,18 @@ int main()
             secretary.removeCourse(courseId);
             break;
         case 13:
-            //
+            cout << "Enter courseId to Edit: " << endl;
+            cin >> courseId;
+            secretary.editCourse(courseId);
             break;
         case 14: // Display Courses
             secretary.loadCourses();
-
             break;
         case 15:
-            //
+
             break;
         }
-        break;
     }
-
-    // Load students and professors from CSV files
-
-    // secretary.loadProfessors();
-    // secretary.loadCourses();
-
-    // Displaying loaded students
-    // cout << "Loaded Students: " << endl;
-    // for (const auto *student : secretary.getStudents())
-    // {
-    //     cout << "AFM: " << student->getAFM() << endl;
-    // }
 
     return 0;
 }
