@@ -201,9 +201,11 @@ public:
 
     void setId(int newCourseId) { courseId = newCourseId; } // Function to set Name
     void setName(string newName) { courseName = newName; }  // Function to set Name
-    string getName() const { return courseName; }           // Function to return Name
     int getCourseId() const { return courseId; }            // Function to return Course Id
+    string getName() const { return courseName; }           // Function to return Name
+    int getSemester() const { return semester; }            // Function to return Semeseter
     int getPoints() const { return points; }                // Function to return Points
+    bool getMandatory() const { return mandatory; }
 };
 
 class Student : public Person
@@ -252,17 +254,18 @@ public:
         }
     }
 
-    void checkGraduation() // Function to check if able to graduate
+    int checkGraduation() // Function to check if able to graduate
     {
-        if (currentSemester > 8 && accumulatedPoints >= 240) //
+        if (currentSemester > 4 && accumulatedPoints >= 240) //
         {
             graduated = 1;
-            cout << "You can Graduate!" << endl;
         }
         else
         {
-            cout << "You can't Graduate yet" << endl;
+            graduated = 0;
         }
+
+        return graduated;
     }
 
     void setCurrentSemester(int newCurrentSemester)
@@ -657,6 +660,46 @@ public:
         file.close();
     }
 
+    void removeStudentFromAllCourses(const string &afm)
+    {
+        ifstream file("studentsToCourses.csv");
+        string line;
+
+        if (!file.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        // Create a temporary file
+        ofstream tempFile("temp.csv");
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string studentAfm;
+
+            getline(ss, studentAfm, ',');
+
+            studentAfm = trim(studentAfm);
+
+            if (studentAfm != afm)
+            {
+                tempFile << line << endl;
+            }
+        }
+
+        // Close both the files
+        file.close();
+        tempFile.close();
+
+        // Remove the original file
+        remove("studentsToCourses.csv");
+        removeEmptyLines("temp.csv");
+        // Rename the temporary file to the original file name
+        rename("temp.csv", "studentsToCourses.csv");
+    }
+
     void removeStudent(const string &afm)
     {
         bool removed = false;
@@ -701,6 +744,7 @@ public:
             }
 
             file.close();
+            removeStudentFromAllCourses(afm);
         }
         else
         {
@@ -826,6 +870,46 @@ public:
         file.close();
     }
 
+    void removeProfessorFromAllCourses(const string &afm)
+    {
+        ifstream file("professorsToCourses.csv");
+        string line;
+
+        if (!file.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        // Create a temporary file
+        ofstream tempFile("temp.csv");
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string professorAfm;
+
+            getline(ss, professorAfm, ',');
+
+            professorAfm = trim(professorAfm);
+
+            if (professorAfm != afm)
+            {
+                tempFile << line << endl;
+            }
+        }
+
+        // Close both the files
+        file.close();
+        tempFile.close();
+
+        // Remove the original file
+        remove("professorsToCourses.csv");
+        removeEmptyLines("temp.csv");
+        // Rename the temporary file to the original file name
+        rename("temp.csv", "professorsToCourses.csv");
+    }
+
     void removeProfessor(const string &afm)
     {
         bool removed = false;
@@ -857,7 +941,7 @@ public:
             // Write the header
             file << "name,afm,age" << endl;
 
-            // Write the remaining students to the file
+            // Write the remaining professors to the file
             for (const auto *professor : allProfessors)
             {
                 file << professor->getName() << ","
@@ -867,7 +951,7 @@ public:
 
             file.close();
 
-            // HAS TO REMOVE FROM ProfessorsToCourses file too !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            removeProfessorFromAllCourses(afm);
         }
         else
         {
@@ -962,6 +1046,57 @@ public:
         file.close();
     }
 
+    void removeCourse(int courseId)
+    {
+        bool removed = false;
+        for (auto it = allCourses.begin(); it != allCourses.end();)
+        {
+            if ((*it)->getCourseId() == courseId)
+            {
+                delete *it;                // Free the memory of the student object
+                it = allCourses.erase(it); // Remove the Course from the vector and update the iterator
+                removed = true;
+            }
+            else
+            {
+                ++it; // Only increment if not erased
+            }
+        }
+
+        if (removed)
+        {
+            cout << "Course with courseId " << courseId << " has been removed." << endl;
+            // Rewrite the courses.csv file without the removed student
+            ofstream file("courses.csv");
+            if (!file.is_open())
+            {
+                cerr << "Error opening file for writing" << endl;
+                return;
+            }
+
+            // Write the header
+            file << "courseId,courseName,semester,points,mandatory" << endl;
+
+            // Write the remaining courses to the file
+            for (const auto *course : allCourses)
+            {
+                file << course->getCourseId() << ","
+                     << course->getName() << ","
+                     << course->getSemester() << ","
+                     << course->getPoints() << ","
+                     << course->getMandatory() << endl;
+            }
+
+            file.close();
+
+            // HAS TO REMOVE FROM studnets to courses file too !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        }
+        else
+        {
+            cout << "The courseId is not in the vector." << endl;
+        }
+    }
+
     int getAccumulatedPoints(const string &afm)
     {
         ifstream file("studentsToCourses.csv");
@@ -998,6 +1133,26 @@ public:
             }
         }
         return points;
+    }
+
+    void checkIfStudentGraduates(const string &afm)
+    {
+        for (auto &student : allStudents)
+        {
+            if (student->getAFM() == afm)
+            {
+
+                if (student->checkGraduation() == 1)
+                {
+                    cout << "Student with afm " << afm << " has graduated";
+                }
+                else
+                {
+                    cout << "Student with afm " << afm << " has not graduated yet";
+                }
+                break;
+            }
+        }
     }
 
     const vector<Student *> &getStudents() const { return allStudents; }       // Getter for allStudents
@@ -1058,6 +1213,7 @@ int main()
             break;
         case 3:
             // Check graduation eligibility
+            secretary.checkIfStudentGraduates(afm);
             break;
         }
         break;
@@ -1182,7 +1338,9 @@ int main()
             secretary.addCourse(courseId, courseName, semester, points, mandatory);
             break;
         case 12:
-            //
+            cout << "Enter Course Id to Remove: " << endl;
+            cin >> courseId;
+            secretary.removeCourse(courseId);
             break;
         case 13:
             //
