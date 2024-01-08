@@ -18,7 +18,7 @@ string trim(const string &str)
     return str.substr(first, (last - first + 1));
 }
 
-void removeEmptyLines(const string &filename)
+void removeEmptyLines(const string &filename) // Function To remove empty lines from csv files
 {
     ifstream file(filename);
     if (!file.is_open())
@@ -208,7 +208,7 @@ public:
     string getName() const { return courseName; }                      // Function to return Name
     int getSemester() const { return semester; }                       // Function to return Semeseter
     int getPoints() const { return points; }                           // Function to return Points
-    bool getMandatory() const { return mandatory; }
+    bool getMandatory() const { return mandatory; }                    // Function to return Mandatory
 };
 
 class Student : public Person
@@ -269,32 +269,32 @@ public:
         return graduated;
     }
 
-    void setCurrentSemester(int newCurrentSemester)
+    void setCurrentSemester(int newCurrentSemester) // Function to set Semester
     {
         currentSemester = newCurrentSemester;
     }
 
-    void setAccumulatedPoints(int newAccumulatedPoints)
+    void setAccumulatedPoints(int newAccumulatedPoints) // Function to set Semester
     {
         accumulatedPoints = newAccumulatedPoints;
     }
 
-    void setGraduated(bool isGraduated)
+    void setGraduated(bool isGraduated) // Function to set Graduated
     {
         graduated = isGraduated;
     }
 
-    int getCurrentSemester() const
+    int getCurrentSemester() const // Function to get Semester
     {
         return currentSemester;
     }
 
-    int getAccumulatedPoints() const
+    int getAccumulatedPoints() const // Function to get Accumulated Points
     {
         return accumulatedPoints;
     }
 
-    int getGraduated() const
+    int getGraduated() const // Function to set Graduated
     {
         return graduated;
     }
@@ -1411,7 +1411,6 @@ int main()
     removeEmptyLines("professorsToCourses.csv");
     removeEmptyLines("studentsToCourses.csv");
 
-    // Create an instance of Secretary
     Secretary secretary;
 
     secretary.loadStudents();
@@ -1423,26 +1422,44 @@ int main()
     bool mandatory;
 
     cout << "\n\t Welcome to my University Department Monitor System" << endl;
-
     cout << "1. Login As Student" << endl;
     cout << "2. Login As Professor" << endl;
     cout << "3. Login As Secretary" << endl;
-    cout << "Give option 1 - 3 : ";
-    cin >> loginOption;
-
+    while (true)
+    {
+        cout << "Give option 1 - 3: ";
+        cin >> loginOption;
+        if (loginOption >= 1 && loginOption <= 3)
+        {
+            break;
+        }
+        else
+        {
+            cout << "Invalid option. Please enter 1, 2, or 3." << endl;
+        }
+    }
     switch (loginOption)
     {
     case 1: // Student
         cout << "\tYou are logged in as a Student" << endl;
         cout << "Give your AFM: ";
         cin >> afm;
-
         cout << "1. Enroll self to course" << endl;
         cout << "2. Calculate Accumulated Points" << endl;
         cout << "3. Check graduation eligibility" << endl;
-        cout << "Give option 1 - 3 : " << endl;
-        cin >> methodOption;
-
+        while (true)
+        {
+            cout << "Give option 1 - 3: ";
+            cin >> methodOption;
+            if (methodOption >= 1 && methodOption <= 3)
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid option. Please enter 1, 2, or 3." << endl;
+            }
+        }
         switch (methodOption)
         {
         case 1:
@@ -1461,17 +1478,13 @@ int main()
             break;
         }
         break;
-
     case 2: // Professor
         cout << "\tYou are logged in as a Professor" << endl;
         cout << "Give your AFM: ";
         cin >> afm;
-
         cout << "Set Finals grade for student" << endl;
         secretary.gradeStudent(afm);
-
         break;
-
     case 3: // Secretary
         cout << "\tYou are logged in as the Secretary" << endl;
 
@@ -1492,8 +1505,19 @@ int main()
         cout << "12. Remove Course" << endl;
         cout << "13. Update Course Details" << endl; // Also able to move course's semseter
         cout << "14. List Courses" << endl;
-        cout << "Give option 1 - 14 : " << endl;
-        cin >> methodOption;
+        while (true)
+        {
+            cout << "Give option 1 - 14: ";
+            cin >> methodOption;
+            if (methodOption >= 1 && methodOption <= 14)
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid option. Please enter 1 - 14" << endl;
+            }
+        }
 
         switch (methodOption)
         {
@@ -1584,6 +1608,5 @@ int main()
             break;
         }
     }
-
     return 0;
 }
