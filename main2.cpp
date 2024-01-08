@@ -216,21 +216,19 @@ class Student : public Person
 private:
     int currentSemester;
     int accumulatedPoints;
-    int finalGrade;
     int graduated;
     vector<Course *> enrolledCourses;
 
 public:
     // Constructor for Student
     Student(string name, string afm, int age, int newCurrentSemester, int newAccumulatedPoints,
-            int newFinalGrade, int newGraduated)
+            int newGraduated)
     {
         setName(name);
         setAfm(afm);
         setAge(age);
         currentSemester = newCurrentSemester;
         accumulatedPoints = newAccumulatedPoints;
-        finalGrade = newFinalGrade;
         graduated = newGraduated;
     }
     // Destructor
@@ -281,11 +279,6 @@ public:
         accumulatedPoints = newAccumulatedPoints;
     }
 
-    void setFinalGrade(int newFinalGrade)
-    {
-        finalGrade = newFinalGrade;
-    }
-
     void setGraduated(bool isGraduated)
     {
         graduated = isGraduated;
@@ -299,11 +292,6 @@ public:
     int getAccumulatedPoints() const
     {
         return accumulatedPoints;
-    }
-
-    int getFinalGrade() const
-    {
-        return finalGrade;
     }
 
     int getGraduated() const
@@ -444,14 +432,13 @@ public:
         {
 
             stringstream ss(line);
-            string name, afm, age, currentSemester, finalGrade, accumulatedPoints, graduated;
+            string name, afm, age, currentSemester, accumulatedPoints, graduated;
 
             getline(ss, name, ',');
             getline(ss, afm, ',');
             getline(ss, age, ',');
             getline(ss, currentSemester, ',');
             getline(ss, accumulatedPoints, ',');
-            getline(ss, finalGrade, ',');
             getline(ss, graduated, ',');
 
             name = trim(name);
@@ -459,12 +446,10 @@ public:
             age = trim(age);
             currentSemester = trim(currentSemester);
             accumulatedPoints = trim(accumulatedPoints);
-            finalGrade = trim(finalGrade);
             graduated = trim(graduated);
 
-            Student *newStudent = new Student(name, afm, stoi(age), stoi(currentSemester), stoi(accumulatedPoints), stoi(finalGrade), stoi(graduated));
+            Student *newStudent = new Student(name, afm, stoi(age), stoi(currentSemester), stoi(accumulatedPoints), stoi(graduated));
             allStudents.push_back(newStudent);
-            // cout << name << "," << afm << "," << age << "," << currentSemester << "," << accumulatedPoints << "," << finalGrade << "," << graduated << endl;
         }
 
         file.close();
@@ -654,7 +639,7 @@ public:
         file << name << "," << afm << "," << age << "," << 1 << "," << 0 << "," << 0 << "," << 0;
 
         // Create a new Student object
-        Student *newStudent = new Student(name, afm, age, 1, 0, 0, 0);
+        Student *newStudent = new Student(name, afm, age, 1, 0, 0);
 
         // Add the new Student to the allStudents vector
         allStudents.push_back(newStudent);
@@ -732,7 +717,7 @@ public:
             }
 
             // Write the header
-            file << "name,afm,age,currentSemester,accumulatedPoints,finalGrade,graduated" << endl;
+            file << "name,afm,age,currentSemester,accumulatedPoints,graduated" << endl;
 
             // Write the remaining students to the file
             for (const auto *student : allStudents)
@@ -742,7 +727,6 @@ public:
                      << student->getAge() << ","
                      << student->getCurrentSemester() << ","
                      << student->getAccumulatedPoints() << ","
-                     << student->getFinalGrade() << ","
                      << student->getGraduated() << endl;
             }
 
@@ -776,7 +760,7 @@ public:
         }
 
         string newName;
-        int newAge, newCurrentSemester, newAccumulatedPoints, newFinalGrade;
+        int newAge, newCurrentSemester, newAccumulatedPoints;
         bool newGraduated;
         int change;
 
@@ -785,9 +769,8 @@ public:
              << "2. Age" << endl
              << "3. Current Semester" << endl
              << "4. Accumulated Points" << endl
-             << "5. Final Grade" << endl
-             << "6. Gratuated" << endl
-             << "Enter 1-6: " << endl;
+             << "5. Gratuated" << endl
+             << "Enter 1-5: " << endl;
 
         cin >> change;
 
@@ -814,11 +797,6 @@ public:
             studentToEdit->setAccumulatedPoints(newAccumulatedPoints);
             break;
         case 5:
-            cout << "Enter new Final Grade: ";
-            cin >> newFinalGrade;
-            studentToEdit->setFinalGrade(newFinalGrade);
-            break;
-        case 6:
             cout << "Enter new Gratuated: ";
             cin >> newGraduated;
             studentToEdit->setGraduated(newGraduated);
@@ -833,7 +811,7 @@ public:
             return;
         }
 
-        file << "name,afm,age,currentSemester,accumulatedPoints,finalGrade,graduated" << endl;
+        file << "name,afm,age,currentSemester,accumulatedPoints,graduated" << endl;
 
         for (const auto &student : allStudents)
         {
@@ -842,7 +820,6 @@ public:
                  << student->getAge() << ","
                  << student->getCurrentSemester() << ","
                  << student->getAccumulatedPoints() << ","
-                 << student->getFinalGrade() << ","
                  << student->getGraduated() << endl;
         }
 
@@ -1236,6 +1213,192 @@ public:
         }
     }
 
+    void gradeStudent(const string &afm)
+    {
+        // Dispaly Professor's Courses
+        ifstream file("professorsToCourses.csv");
+        string line;
+        removeEmptyLines("professorsToCourses.csv");
+
+        if (!file.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        getline(file, line); // Skip the first line (header)
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string professorAfm, courseId;
+
+            getline(ss, professorAfm, ',');
+            getline(ss, courseId, ',');
+
+            professorAfm = trim(professorAfm);
+            courseId = trim(courseId);
+
+            if (professorAfm == afm)
+            {
+                cout << courseId << endl;
+            }
+        }
+        file.close();
+
+        string courseId;
+        cout << "Give which course Id you want to grade: ";
+        cin >> courseId;
+
+        ifstream file2("studentsToCourses.csv");
+
+        removeEmptyLines("studentsToCourses.csv");
+
+        if (!file2.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        getline(file2, line); // Skip the first line (header)
+
+        while (getline(file2, line))
+        {
+            stringstream ss(line);
+            string studentAfm, newCourseId, grade;
+
+            getline(ss, studentAfm, ',');
+            getline(ss, newCourseId, ',');
+            getline(ss, grade, ',');
+
+            studentAfm = trim(studentAfm);
+            newCourseId = trim(newCourseId);
+            grade = trim(grade);
+
+            if (courseId == newCourseId)
+            {
+                cout << studentAfm << endl;
+            }
+        }
+        file2.close();
+
+        string studentAfm, grade;
+        cout << "Which Student would you like to grade: " << endl;
+        cin >> studentAfm;
+        cout << "Enter Student's Grade: " << endl;
+        cin >> grade;
+
+        ifstream file3("studentsToCourses.csv");
+
+        if (!file3.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        // Create a temporary file
+        ofstream tempFile("temp.csv");
+
+        while (getline(file3, line))
+        {
+            stringstream ss(line);
+            string fileStudentAfm, fileCourseId, fileGrade;
+
+            getline(ss, fileStudentAfm, ',');
+            getline(ss, fileCourseId, ',');
+            getline(ss, fileGrade, ',');
+
+            fileStudentAfm = trim(fileStudentAfm);
+            fileCourseId = trim(fileCourseId);
+            fileGrade = trim(fileGrade);
+
+            if (studentAfm != fileStudentAfm || courseId != fileCourseId)
+            {
+                tempFile << line << endl;
+            }
+            else
+            {
+                tempFile << studentAfm << "," << courseId << "," << grade << endl;
+            }
+        }
+
+        // Close both the files
+        file3.close();
+        tempFile.close();
+
+        // Remove the original file
+        remove("studentsToCourses.csv");
+        removeEmptyLines("temp.csv");
+        // Rename the temporary file to the original file name
+        rename("temp.csv", "studentsToCourses.csv");
+
+        if (stoi(grade) < 5)
+        {
+            return;
+        }
+
+        int coursePoints;
+        for (const auto *course : allCourses)
+        {
+            if (course->getCourseId() == stoi(courseId))
+            {
+                coursePoints = course->getPoints();
+            }
+        }
+
+        ifstream file4("students.csv");
+
+        if (!file4.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        // Create a temporary file
+        ofstream tempFile2("temp.csv");
+
+        while (getline(file4, line))
+        {
+            stringstream ss(line);
+            string name, afm, age, currentSemester, accumulatedPoints, graduated;
+
+            getline(ss, name, ',');
+            getline(ss, afm, ',');
+            getline(ss, age, ',');
+            getline(ss, currentSemester, ',');
+            getline(ss, accumulatedPoints, ',');
+            getline(ss, graduated, ',');
+
+            name = trim(name);
+            afm = trim(afm);
+            age = trim(age);
+            currentSemester = trim(currentSemester);
+            accumulatedPoints = trim(accumulatedPoints);
+            graduated = trim(graduated);
+
+            if (studentAfm != afm)
+            {
+                tempFile2 << line << endl;
+            }
+            else
+            {
+                tempFile2 << name << "," << afm << "," << age << "," << currentSemester << ","
+                          << stoi(accumulatedPoints) + coursePoints << ","
+                          << graduated << endl;
+            }
+        }
+
+        // Close both the files
+        file4.close();
+        tempFile2.close();
+
+        // Remove the original file
+        remove("students.csv");
+        removeEmptyLines("temp.csv");
+        // Rename the temporary file to the original file name
+        rename("temp.csv", "students.csv");
+    }
+
     const vector<Student *> &getStudents() const { return allStudents; }       // Getter for allStudents
     const vector<Professor *> &getProfessors() const { return allProfessors; } // Getter for allProfessors
     const vector<Course *> &getCourses() const { return allCourses; }          // Getter for allCourses
@@ -1304,20 +1467,9 @@ int main()
         cout << "Give your AFM: ";
         cin >> afm;
 
-        cout << "1. Set Finals grade for student" << endl;
-        cout << "2. Conduct Finals Exam" << endl; // Make it look cool! ex. Loading Final scores... Students are given random score.
-        cout << "Give option 1 - 2 : " << endl;
-        cin >> methodOption;
+        cout << "Set Finals grade for student" << endl;
+        secretary.gradeStudent(afm);
 
-        switch (methodOption)
-        {
-        case 1:
-            // Set Finals grade for student
-            break;
-        case 2:
-            cout << "Conducting Finals Exam" << endl;
-            break;
-        }
         break;
 
     case 3: // Secretary
@@ -1340,8 +1492,7 @@ int main()
         cout << "12. Remove Course" << endl;
         cout << "13. Update Course Details" << endl; // Also able to move course's semseter
         cout << "14. List Courses" << endl;
-        cout << "15. Display Every Functionality" << endl;
-        cout << "Give option 1 - 15 : " << endl;
+        cout << "Give option 1 - 14 : " << endl;
         cin >> methodOption;
 
         switch (methodOption)
@@ -1430,9 +1581,6 @@ int main()
             break;
         case 14: // Display Courses
             secretary.loadCourses();
-            break;
-        case 15:
-
             break;
         }
     }
