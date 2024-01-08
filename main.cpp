@@ -257,7 +257,7 @@ public:
 
     int checkGraduation() // Function to check if able to graduate
     {
-        if (currentSemester > 4 && accumulatedPoints >= 240) //
+        if (currentSemester > 4 && accumulatedPoints >= 112) // Set years to 2 and accumulatedPoints to 122 for convinence
         {
             graduated = 1;
         }
