@@ -4,8 +4,67 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-
+#include <limits>
 using namespace std;
+
+bool lineExists(const string &afm, const string &courseId, const string &grade, const string &filePath)
+{
+    ifstream inFile(filePath);
+    string line;
+    while (getline(inFile, line))
+    {
+        if (line == afm + "," + courseId + "," + grade)
+        {
+            inFile.close();
+            return true;
+        }
+    }
+    inFile.close();
+    return false;
+}
+
+void updatePassedCourses(const string &studentAfm, const string &courseId, const string &grade)
+{
+    ifstream inFile("studentsPassedCourses.csv");
+    ofstream tempFile("temp.csv");
+    string line;
+    bool lineUpdated = false;
+
+    while (getline(inFile, line))
+    {
+        stringstream ss(line);
+        string existingAfm, existingCourseId, existingGrade;
+
+        getline(ss, existingAfm, ',');
+        getline(ss, existingCourseId, ',');
+        getline(ss, existingGrade, ',');
+
+        if (existingAfm == studentAfm && existingCourseId == courseId)
+        {
+            // Update the line with the new grade
+            tempFile << studentAfm << "," << courseId << "," << grade << endl;
+            lineUpdated = true;
+        }
+        else
+        {
+            // Write the line as is to the temp file
+            tempFile << line << endl;
+        }
+    }
+
+    // If the line was not found and updated, add it as a new line
+    if (!lineUpdated)
+    {
+        tempFile << studentAfm << "," << courseId << "," << grade << endl;
+    }
+
+    inFile.close();
+    tempFile.close();
+
+    // Replace the original file with the updated temporary file
+    remove("studentsPassedCourses.csv");
+    rename("temp.csv", "studentsPassedCourses.csv");
+}
 
 string trim(const string &str)
 {
@@ -1397,6 +1456,59 @@ public:
         removeEmptyLines("temp.csv");
         // Rename the temporary file to the original file name
         rename("temp.csv", "students.csv");
+
+        ifstream file5("studentsPassedCourses.csv");
+        ofstream tempFile3("temp.csv");
+
+        if (!file5.is_open() || !tempFile3.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        bool recordFound = false;
+        while (getline(file5, line))
+        {
+            stringstream ss(line);
+            string fileStudentAfm, fileCourseId, fileGrade;
+
+            getline(ss, fileStudentAfm, ',');
+            getline(ss, fileCourseId, ',');
+            getline(ss, fileGrade, ',');
+
+            fileStudentAfm = trim(fileStudentAfm);
+            fileCourseId = trim(fileCourseId);
+
+            // Check if the current line matches the student and course
+            if (fileStudentAfm == studentAfm && fileCourseId == courseId)
+            {
+                recordFound = true;
+                if (stoi(grade) > stoi(fileGrade))
+                {
+                    // Replace with new grade if it is higher
+                    tempFile3 << studentAfm << "," << courseId << "," << grade << endl;
+                }
+                // If the new grade is lower, don't write it (effectively deleting the entry)
+            }
+            else
+            {
+                // Write non-matching records to the temp file
+                tempFile3 << line << endl;
+            }
+        }
+
+        // If the record was not found, append the new record at the end
+        if (!recordFound)
+        {
+            tempFile3 << studentAfm << "," << courseId << "," << grade << endl;
+        }
+
+        file5.close();
+        tempFile3.close();
+
+        remove("studentsPassedCourses.csv");
+        removeEmptyLines("temp.csv");
+        rename("temp.csv", "studentsPassedCourses.csv");
     }
 
     const vector<Student *> &getStudents() const { return allStudents; }       // Getter for allStudents
@@ -1410,6 +1522,7 @@ int main()
 {
     removeEmptyLines("professorsToCourses.csv");
     removeEmptyLines("studentsToCourses.csv");
+    removeEmptyLines("studentsPassedCourses.csv");
 
     Secretary secretary;
 
@@ -1483,6 +1596,7 @@ int main()
         cout << "Give your AFM: ";
         cin >> afm;
         cout << "Set Finals grade for student" << endl;
+
         secretary.gradeStudent(afm);
         break;
     case 3: // Secretary

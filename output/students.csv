@@ -1,7 +1,7 @@
 name,afm,age,currentSemester,accumulatedPoints,graduated
 Isabella,s000,19,3,0,0
 Noah,s001,24,3,0,0
-Emma,s002,19,4,6,0
+Emma,s002,19,4,282,0
 Ava,s003,24,2,0,0
 Mia,s004,18,3,0,0
 Benjamin,s005,18,1,0,0
@@ -21,7 +21,7 @@ Mia,s018,18,1,0,0
 Amelia,s019,19,3,0,0
 Amelia,s020,20,3,0,0
 Benjamin,s021,23,2,0,0
-Ava,s022,23,4,0,0
+Ava,s022,23,4,8,0
 Logan,s023,24,1,0,0
 Benjamin,s024,22,5,0,0
 Ava,s025,18,1,0,0
@@ -73,7 +73,7 @@ Ava,s070,22,2,0,0
 James,s071,19,4,0,0
 Liam,s072,20,2,0,0
 Charlotte,s073,19,4,0,0
-Isabella,s074,19,1,0,0
+Isabella,s074,19,1,2,0
 Abigail,s075,20,1,0,0
 Ava,s076,23,4,0,0
 Amelia,s077,19,3,0,0
@@ -99,4 +99,3 @@ Liam,s096,22,2,0,0
 Liam,s097,24,4,0,0
 Liam,s098,24,2,0,0
 Ava,s099,18,1,0,0
-Test,s999,0,1,0,0
