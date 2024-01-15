@@ -7,6 +7,7 @@
 #include <limits>
 using namespace std;
 
+// Utility Functions
 bool lineExists(const string &afm, const string &courseId, const string &grade, const string &filePath)
 {
     ifstream inFile(filePath);
@@ -22,7 +23,6 @@ bool lineExists(const string &afm, const string &courseId, const string &grade, 
     inFile.close();
     return false;
 }
-
 void updatePassedCourses(const string &studentAfm, const string &courseId, const string &grade)
 {
     ifstream inFile("studentsPassedCourses.csv");
@@ -65,7 +65,6 @@ void updatePassedCourses(const string &studentAfm, const string &courseId, const
     remove("studentsPassedCourses.csv");
     rename("temp.csv", "studentsPassedCourses.csv");
 }
-
 string trim(const string &str)
 {
     size_t first = str.find_first_not_of(" \t\n\r");
@@ -76,7 +75,6 @@ string trim(const string &str)
     size_t last = str.find_last_not_of(" \t\n\r");
     return str.substr(first, (last - first + 1));
 }
-
 void removeEmptyLines(const string &filename) // Function To remove empty lines from csv files
 {
     ifstream file(filename);
@@ -121,10 +119,13 @@ void removeEmptyLines(const string &filename) // Function To remove empty lines 
     outFile.close(); // Close the file after writing
 }
 
-// Forward declarations
+// Forward declarations of classes
 class Student;
 class Professor;
+class Course;
+class Secretary;
 
+// Person Class
 class Person
 {
 private:
@@ -235,6 +236,7 @@ public:
     }
 };
 
+// Course Class
 class Course
 {
 public:
@@ -270,6 +272,7 @@ public:
     bool getMandatory() const { return mandatory; }                    // Function to return Mandatory
 };
 
+// Student Class
 class Student : public Person
 {
 private:
@@ -359,6 +362,7 @@ public:
     }
 };
 
+// Professor Class
 class Professor : public Person
 {
 private:
@@ -398,6 +402,7 @@ public:
     }
 };
 
+// Secretary Class
 class Secretary
 {
 private:
