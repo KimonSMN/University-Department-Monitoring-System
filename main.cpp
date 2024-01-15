@@ -1261,11 +1261,11 @@ public:
 
                 if (student->checkGraduation() == 1)
                 {
-                    cout << "Student with afm " << afm << " has graduated";
+                    cout << "Student with afm " << afm << " can graduated";
                 }
                 else
                 {
-                    cout << "Student with afm " << afm << " has not graduated yet";
+                    cout << "Student with afm " << afm << " can not graduated yet";
                 }
                 break;
             }
@@ -1511,6 +1511,142 @@ public:
         rename("temp.csv", "studentsPassedCourses.csv");
     }
 
+    void printEligibleForGraduationStudents()
+    {
+        ifstream file("students.csv");
+        string line;
+        removeEmptyLines("students.csv");
+
+        if (!file.is_open())
+        {
+            cerr << "Error opening file" << endl;
+            return;
+        }
+
+        // Skip the header line
+        getline(file, line);
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string name, afm, age, currentSemester, accumulatedPoints, graduated;
+
+            getline(ss, name, ',');
+            getline(ss, afm, ',');
+            getline(ss, age, ',');
+            getline(ss, currentSemester, ',');
+            getline(ss, accumulatedPoints, ',');
+            getline(ss, graduated, ',');
+
+            if (graduated == "1")
+            {
+                cout << "Student AFM: " << afm << ", Name: " << name << endl;
+            }
+        }
+
+        file.close();
+    }
+
+    void printCoursesForStudent(const string &afm)
+    {
+        ifstream file("studentsToCourses.csv");
+        string line;
+
+        // Check if the file is open
+        if (!file.is_open())
+        {
+            cerr << "Error opening file: " << endl;
+            return;
+        }
+
+        while (getline(file, line))
+        {
+            stringstream ss(line);
+            string studentAfm, courseId, grade;
+
+            getline(ss, studentAfm, ',');
+            getline(ss, courseId, ',');
+            getline(ss, grade, ',');
+
+            if (studentAfm == afm)
+            {
+                cout << "Course ID: " << courseId << ", Grade: " << grade << endl;
+            }
+        }
+
+        file.close();
+    }
+
+    void printProfessorCourseStatistics(const string &professorAfm)
+    {
+        ifstream proffesorFile("professorsToCourses.csv");
+        vector<string> courses;
+        string line;
+
+        if (!proffesorFile.is_open())
+        {
+            cerr << "Error opening file: " << endl;
+            return;
+        }
+
+        while (getline(proffesorFile, line))
+        {
+            stringstream ss(line);
+            string profAfm, courseId;
+            getline(ss, profAfm, ',');
+            getline(ss, courseId, ',');
+
+            if (profAfm == professorAfm)
+            {
+                courses.push_back(courseId);
+            }
+        }
+
+        proffesorFile.close();
+
+        // Step 2: For each course, find the percentage of students who scored 5 or higher
+        ifstream studentFile("studentsToCourses.csv");
+
+        if (!studentFile.is_open())
+        {
+            cerr << "Error opening file: " << endl;
+            return;
+        }
+
+        for (const auto &courseId : courses)
+        {
+            int totalStudents = 0;
+            int studentsPassed = 0;
+
+            // Reset the file read pointer to the beginning
+            studentFile.clear();
+            studentFile.seekg(0);
+
+            while (getline(studentFile, line))
+            {
+                stringstream ss(line);
+                string studentAfm, studentCourseId, gradeStr;
+                getline(ss, studentAfm, ',');
+                getline(ss, studentCourseId, ',');
+                getline(ss, gradeStr, ',');
+
+                if (studentCourseId == courseId)
+                {
+                    totalStudents++;
+                    if (stoi(gradeStr) >= 5)
+                    {
+                        studentsPassed++;
+                    }
+                }
+            }
+
+            double passPercentage = totalStudents > 0 ? (studentsPassed * 100.0) / totalStudents : 0;
+            cout << "Course ID: " << courseId << ", Pass Percentage: " << passPercentage << "%" << endl;
+        }
+
+        studentFile.close();
+    }
+
     const vector<Student *> &getStudents() const { return allStudents; }       // Getter for allStudents
     const vector<Professor *> &getProfessors() const { return allProfessors; } // Getter for allProfessors
     const vector<Course *> &getCourses() const { return allCourses; }          // Getter for allCourses
@@ -1560,17 +1696,18 @@ int main()
         cout << "1. Enroll self to course" << endl;
         cout << "2. Calculate Accumulated Points" << endl;
         cout << "3. Check graduation eligibility" << endl;
+        cout << "4. Print Taken Courses's Grades" << endl;
         while (true)
         {
-            cout << "Give option 1 - 3: ";
+            cout << "Give option 1 - 4: ";
             cin >> methodOption;
-            if (methodOption >= 1 && methodOption <= 3)
+            if (methodOption >= 1 && methodOption <= 4)
             {
                 break;
             }
             else
             {
-                cout << "Invalid option. Please enter 1, 2, or 3." << endl;
+                cout << "Invalid option. Please enter 1 - 4." << endl;
             }
         }
         switch (methodOption)
@@ -1589,15 +1726,39 @@ int main()
             // Check graduation eligibility
             secretary.checkIfStudentGraduates(afm);
             break;
+        case 4:
+            secretary.printCoursesForStudent(afm);
+            break;
         }
         break;
     case 2: // Professor
         cout << "\tYou are logged in as a Professor" << endl;
         cout << "Give your AFM: ";
         cin >> afm;
-        cout << "Set Finals grade for student" << endl;
-
-        secretary.gradeStudent(afm);
+        cout << "1. Set Finals grade for student" << endl;
+        cout << "2. Print Current Courses's Statistics" << endl;
+        while (true)
+        {
+            cout << "Give option 1 or 2: ";
+            cin >> methodOption;
+            if (methodOption >= 1 && methodOption <= 2)
+            {
+                break;
+            }
+            else
+            {
+                cout << "Invalid option. Please enter 1 - 2." << endl;
+            }
+        }
+        switch (methodOption)
+        {
+        case 1:
+            secretary.gradeStudent(afm);
+            break;
+        case 2:
+            secretary.printProfessorCourseStatistics(afm);
+            break;
+        }
         break;
     case 3: // Secretary
         cout << "\tYou are logged in as the Secretary" << endl;
@@ -1619,17 +1780,18 @@ int main()
         cout << "12. Remove Course" << endl;
         cout << "13. Update Course Details" << endl; // Also able to move course's semseter
         cout << "14. List Courses" << endl;
+        cout << "15. Print Graduation Eligible Students" << endl;
         while (true)
         {
-            cout << "Give option 1 - 14: ";
+            cout << "Give option 1 - 15: ";
             cin >> methodOption;
-            if (methodOption >= 1 && methodOption <= 14)
+            if (methodOption >= 1 && methodOption <= 15)
             {
                 break;
             }
             else
             {
-                cout << "Invalid option. Please enter 1 - 14" << endl;
+                cout << "Invalid option. Please enter 1 - 15" << endl;
             }
         }
 
@@ -1719,6 +1881,10 @@ int main()
             break;
         case 14: // Display Courses
             secretary.loadCourses();
+            break;
+        case 15:
+            cout << "Students that can get their degree are:" << endl;
+            secretary.printEligibleForGraduationStudents();
             break;
         }
     }

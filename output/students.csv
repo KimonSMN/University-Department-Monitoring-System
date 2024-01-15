@@ -45,12 +45,12 @@ Sophia,s042,22,3,0,0
 Olivia,s043,23,1,0,0
 Sophia,s044,22,3,0,0
 James,s045,19,3,0,0
-Isabella,s046,23,3,0,0
-Charlotte,s047,23,3,0,0
-Charlotte,s048,19,3,0,0
+Isabella,s046,23,3,0,1
+Charlotte,s047,23,3,0,1
+Charlotte,s048,19,3,0,1
 Noah,s049,21,4,0,0
 Benjamin,s050,22,3,0,0
-Liam,s051,22,2,0,0
+Liam,s051,22,2,0,1
 Liam,s052,20,3,0,0
 Charlotte,s053,21,1,0,0
 Abigail,s054,21,4,0,0
@@ -76,7 +76,7 @@ Charlotte,s073,19,4,0,0
 Isabella,s074,19,1,2,0
 Abigail,s075,20,1,0,0
 Ava,s076,23,4,0,0
-Amelia,s077,19,3,0,0
+Amelia,s077,19,3,2,0
 Noah,s078,20,1,0,0
 Isabella,s079,22,4,0,0
 James,s080,24,4,0,0
